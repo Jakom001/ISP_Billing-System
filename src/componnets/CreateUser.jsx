@@ -16,9 +16,9 @@ const CreateUser = () => {
         address:"",
         comment:"",
     })
+
     const [errors, setErrors] = useState({});
     const [submitted, setSubmitted] = useState(false);
-    const [showCustomPackage, setShowCustomPackage] = useState(false);
 
     const packages = [
         {value: "", label: "Select a package"},

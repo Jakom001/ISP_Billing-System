@@ -1,3 +1,5 @@
+
+
 import React, { useState, useMemo } from 'react';
 import DataTable from 'react-data-table-component';
 import { 
@@ -7,14 +9,14 @@ import {
 } from 'lucide-react';
 // Sample data - replace with your actual data source
 const initialData = [
-  { id: 1, fullName: "omuga", phoneNumber: "073988383", package: "3 mbps", expiry: "10 days from now", expiryDate: "04/10/2020" },
-  { id: 2, fullName: "omuga", phoneNumber: "073988383", package: "6 mbps", expiry: "2 days from now", expiryDate: "04/10/2020" },
-  { id: 3, fullName: "omuga", phoneNumber: "073988383", package: "3 mbps", expiry: "Expired", expiryDate: "04/10/2020" },
-  { id: 4, fullName: "okinyo", phoneNumber: "073988383", package: "10 mbps", expiry: "Expired", expiryDate: "04/10/2020" },
-  { id: 5, fullName: "omuga", phoneNumber: "073988383", package: "5 mbps", expiry: "Expired", expiryDate: "04/10/2020" }
+  { packageName: "omuga", price: "073988383", downloadSpeed: "3 mbps", uploadSpeed: "3 mbps", type: "10 days from now"},
+  { packageName: "omuga", price: "073988383", downloadSpeed: "6 mbps", uploadSpeed: "3 mbps", type: "2 days from now"},
+  { packageName: "omuga", price: "073988383", downloadSpeed: "3 mbps", uploadSpeed: "3 mbps", type: "Expired"},
+  { packageName: "okinyo",price: "073988383", downloadSpeed: "10 mbps",uploadSpeed: "3 mbps",type: "Expired"},
+  { packageName: "omuga", price: "073988383", downloadSpeed: "5 mbps", uploadSpeed: "3 mbps", type: "Expired"}
 ];
 
-const Users = () => {
+const Packages = () => {
   const [filterText, setFilterText] = useState('');
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
 
@@ -22,50 +24,26 @@ const Users = () => {
   const columns = [
     
     {
-      name: 'Full Name',
-      selector: row => row.fullName,
+      name: 'Name',
+      selector: row => row.packageName,
       sortable: true,
     },
     {
-      name: 'Phone Number',
-      selector: row => row.phoneNumber,
+      name: 'Price',
+      selector: row => row.price,
       sortable: true,
     },
     {
-      name: 'Package',
-      selector: row => row.package,
+      name: 'Download Speed',
+      selector: row => row.downloadSpeed,
       sortable: true,
     },
     {
-      name: 'Expiry status',
-      selector: row => row.expiry,
+      name: 'Upload Speed',
+      selector: row => row.uploadSpeed,
       sortable: true,
-      cell: row => (
-        <span className={`px-2 py-1 rounded ${
-          row.expiry === 'Expired' 
-            ?  'bg-red-100 text-red-800'
-            : 'bg-green-100 text-green-800' 
-             
-        }`}>
-          {row.expiry}
-        </span>
-      )
     },
-    {
-      name: 'Expiry Date',
-      selector: row => row.expiryDate,
-      sortable: true,
-      cell: row => (
-        <span className={`px-2 py-1 rounded ${
-          row.expiry === 'Expired' 
-            ?  'bg-red-100 text-red-800'
-            : 'bg-green-100 text-green-800' 
-             
-        }`}>
-          {row.expiryDate}
-        </span>
-      )
-    },
+    
     {
       name: 'Actions',
       cell: (row) => (
@@ -106,13 +84,12 @@ const Users = () => {
   // Filtering logic
   const filteredItems = initialData.filter(
     item => 
-      // Text search across name, email, status
-      (item.fullName.toLowerCase().includes(filterText.toLowerCase()) ||
-       item.phoneNumber.toLowerCase().includes(filterText.toLowerCase()))
+      (item.packageName.toLowerCase().includes(filterText.toLowerCase()) ||
+       item.type.toLowerCase().includes(filterText.toLowerCase()))
   );
 
   const FilterComponents = (
-    <div className="flex justify-end pr-8 text-blackColor space-x-4 mb-4">
+    <div className="flex text-blackColor space-x-4 mb-4">
       {/* Search Input */}
       <input
         type="text"
@@ -159,8 +136,7 @@ const Users = () => {
   };
 
   return (
-    <div className="p-4 bg-white text-blackColor shadow-md rounded-lg">
-      <h1>List of users</h1>
+    <div className="p-4 bg-white shadow-md rounded-lg">
       {FilterComponents}
       <DataTable
         columns={columns}
@@ -175,4 +151,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Packages;
