@@ -12,7 +12,7 @@ const CreateUser = () => {
         package:"",
         email: "",
         expiryDate:'',
-        phonenumber:"",
+        phoneNumber:"",
         address:"",
         comment:"",
     })
@@ -151,10 +151,10 @@ const CreateUser = () => {
                 newErrors.expiryDate = 'Expiry date cannot be in the past';
             }
         }
-        if (!formData.phonenumber) {
-            newErrors.phonenumber = 'Phone number is required';
-        } else if (!/^\d{10}$/.test(formData.phonenumber.replace(/\D/g, ''))) {
-            newErrors.phonenumber = 'Please enter a valid 10-digit phone number';
+        if (!formData.phoneNumber) {
+            newErrors.phoneNumber = 'Phone number is required';
+        } else if (!/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ''))) {
+            newErrors.phoneNumber = 'Please enter a valid 10-digit phone number';
         }
         if (!formData.address.trim()) {
         newErrors.address = 'Address is required';
@@ -199,7 +199,7 @@ const CreateUser = () => {
                     package: "",
                     email: "",
                     expiryDate: "",
-                    phonenumber: "",
+                    phoneNumber: "",
                     address: "",
                     comment: "",
                   });
@@ -421,13 +421,13 @@ const CreateUser = () => {
                 </label>
                 <input
                   type="tel"
-                  name="phonenumber"
-                  value={formData.phonenumber}
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.phonenumber && (
-                  <p className="mt-1 text-sm text-red-600">{errors.phonenumber}</p>
+                {errors.phoneNumber && (
+                  <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
                 )}
               </div>
             </div>
