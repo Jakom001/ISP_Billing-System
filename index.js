@@ -1,15 +1,22 @@
 const express = require("express");
-const mongoose = require("mongoose");
-
+const userRoutes = require("./routes/usersRoutes");
+const connectDB = require("./config/db");
 const app = express()
 
-mongoose.connect("mongodb://localhost:27017/isp")
-.then((result) => app.listen(4000))
-.catch((err) => console.log(err));
+app.use(express.json)
+
+// Connect Database
+connectDB();
+
 
 app.get("/", (req, res) =>{
-    res.send("hello there")
+    res.send("home")
 })
+app.use("/api", userRoutes)
 app.use((req, res) =>{
     res.status(404).send("page not found")
+})
+
+app.listen(4000, () =>{
+    console.log("Server running in port 4000")
 })
