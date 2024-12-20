@@ -3,7 +3,7 @@ const userRoutes = require("./routes/usersRoutes");
 const connectDB = require("./config/db");
 const app = express()
 
-app.use(express.json)
+app.use(express.json())
 
 // Connect Database
 connectDB();
