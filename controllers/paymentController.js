@@ -1,5 +1,5 @@
-const Payment = require("../controllers/Payment")
-const paymentSchema = require("../middlewares/validator")
+const Payment = require("../models/paymentModel");
+const { paymentSchema } = require("../middlewares/validator")
 
 const getPayments = async (req, res) => {
     try {

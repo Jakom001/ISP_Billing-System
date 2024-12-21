@@ -10,7 +10,7 @@ router.put('/update-user/:id', userController.updateUser)
 
 router.delete('/delete-user/:id', userController.deleteUser)
 
-router.get('/single-user/:id', userController.singleUser)
+router.get('/single-user/:id', userController.getUserById)
 
 
 module.exports = router

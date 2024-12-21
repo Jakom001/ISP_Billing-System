@@ -13,6 +13,19 @@ const getUsers = async (req, res) =>{
     }
 }
 
+const getUserById = async (req, res) =>{
+    try{
+        const result = await User.findById(req.params.id)
+        if(!result){
+            return res.status(404).json({success:false, message: "User not found"})
+        }
+        res.status(200).json({success:true, message: "User", data:result})
+    }
+    catch(error){
+        res.status(500).json({success:false, message: "Error retrieving user", error: error.message})
+    }
+}
+
 const addUser = async(req,res) =>{
     const {
         type,
@@ -159,18 +172,7 @@ const updateUser = async (req, res) =>{
     }
 }
 
-const getUserById = async (req, res) =>{
-    try{
-        const result = await User.findById(req.params.id)
-        if(!result){
-            return res.status(404).json({success:false, message: "User not found"})
-        }
-        res.status(200).json({success:true, message: "User", data:result})
-    }
-    catch(error){
-        res.status(500).json({success:false, message: "Error retrieving user", error: error.message})
-    }
-}
+
 
 module.exports = {
     getUsers,

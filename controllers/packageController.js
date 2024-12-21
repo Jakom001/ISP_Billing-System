@@ -1,5 +1,5 @@
 const Package = require("../models/packageModel");
-const packageSchema = require("../middlewares/validator");
+const {packageSchema} = require("../middlewares/validator");
 
 const getPackages = async (req, res) => {
     try {
@@ -88,7 +88,7 @@ const deletePackage = async (req, res) => {
         if (!result) {
             return res.status(404).json({ success: false, message: "Package not found" });
         }
-        res.status(200).json({ success: true, message: "Package deleted" });
+        res.status(200).json({ success: true, message: "Package deleted", data: result });
     }
     catch (error) {
         res.status(500).json({

@@ -1,7 +1,7 @@
 const express = require("express");
 const userRoutes = require("./routes/usersRoutes");
 const packageRoutes = require("./routes/packageRoutes");
-const packageRoutes = require("./routes/packageRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 // Connect Database
 const connectDB = require("./config/db");
@@ -16,8 +16,9 @@ connectDB();
 app.get("/", (req, res) =>{
     res.send("home")
 })
-app.use("/api", userRoutes, packageRoutes, )
-
+app.use("/api/users", userRoutes)
+app.use("/api/packages", packageRoutes)
+app.use("/api/payments", paymentRoutes)
 
 app.use((req, res) =>{
     res.status(404).send("page not found")

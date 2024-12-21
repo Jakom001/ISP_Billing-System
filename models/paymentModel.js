@@ -8,15 +8,15 @@ const PaymentSchema = new mongoose.Schema({
   },
   amount: {
     type: Number,
-    required: true,
+    required: [true, 'Please add an amount'],
   },
   receiptNumber: {
     type: String,
-    required: true,
+    required: [true, 'Please add a receipt number'],
   },
   paymentDate: {
     type: Date,
-    required: true,
+    required: [true, 'Please add a payment date'],
   },
   paymentStatus: {
     type: String,
