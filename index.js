@@ -12,7 +12,9 @@ connectDB();
 app.get("/", (req, res) =>{
     res.send("home")
 })
-app.use("/api", userRoutes)
+app.use("/api", userRoutes, packageRoutes)
+
+
 app.use((req, res) =>{
     res.status(404).send("page not found")
 })
