@@ -15,7 +15,7 @@ const userSchema = Joi.object({
     expiryDate: Joi.date().iso().required(),
     phoneNumber: Joi.string().min(10).required(),
     address: Joi.string().optional(),
-    comment: Joi.string().optional(),
+    comment: Joi.string().optional(),    
 })
 
 const packageSchema = Joi.object({
@@ -26,6 +26,20 @@ const packageSchema = Joi.object({
     downloadSpeed: Joi.string().required(),
 })
 
-module.exports = userSchema;
+const paymentSchema = Joi.object({
+    amount: Joi.number().required(),
+    paymentMethod: Joi.string().valid("cash", "bank", "mpesa").required(),
+    paymentDate: Joi.date().iso().required(),
+    user: Joi.string().required(),
+    comment: Joi.string().optional(),
+    receiptNumber: Joi.string().required(),
+    paymentStatus: Joi.string().valid("paid", "unpaid").required(),
+    checked: Joi.string().valid("yes", "no").required(),
+})
 
-module.exports = packageSchema;
+module.exports = {
+    userSchema,
+    packageSchema,
+    paymentSchema
+};
+
