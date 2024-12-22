@@ -1,4 +1,5 @@
-const User = require("../models/UserModel");
+const User = require("../models/userModel");
+const Package = require("../models/packageModel");
 const { userSchema } = require("../middlewares/validator");
 
 const getUsers = async (req, res) =>{
@@ -15,7 +16,7 @@ const getUsers = async (req, res) =>{
 
 const getUserById = async (req, res) =>{
     try{
-        const result = await User.findById(req.params.id)
+        const result = await User.findById(req.params.id).populate("package")
         if(!result){
             return res.status(404).json({success:false, message: "User not found"})
         }
@@ -34,7 +35,7 @@ const addUser = async(req,res) =>{
         username,
         password,
         confirmPassword,
-        package,
+        packageId,
         email,
         expiryDate,
         phoneNumber,
@@ -52,7 +53,7 @@ const addUser = async(req,res) =>{
                 username,
                 password,
                 confirmPassword,
-                package,
+                packageId,
                 email,
                 expiryDate,
                 phoneNumber,
@@ -67,7 +68,13 @@ const addUser = async(req,res) =>{
                 errors: error.details.map((err) => err.message),
             });
         }
-    
+        
+        // Validate the package
+        const selectedPackage = await Package.findById(packageId);
+        if (!selectedPackage) {
+        return res.status(400).json({ message: "Invalid package selected" });
+        }
+
         const user = new User(
             {
                 type,
@@ -75,7 +82,8 @@ const addUser = async(req,res) =>{
                 lastName,
                 username,
                 password,
-                package,
+                package: packageId,
+                balance: 0,
                 email,
                 expiryDate,
                 phoneNumber,
@@ -113,7 +121,7 @@ const updateUser = async (req, res) =>{
         username,
         password,
         confirmPassword,
-        package,
+        packageId,
         email,
         expiryDate,
         phoneNumber,
@@ -129,7 +137,7 @@ const updateUser = async (req, res) =>{
                 username,
                 password,
                 confirmPassword,
-                package,
+                packageId,
                 email,
                 expiryDate,
                 phoneNumber,
@@ -145,6 +153,12 @@ const updateUser = async (req, res) =>{
             });
         }
 
+        // Validate the package
+        const selectedPackage = await Package.findById(packageId);
+        if (!selectedPackage) {
+        return res.status(400).json({ message: "Invalid package selected" });
+        }
+
         const result = await User.findByIdAndUpdate(req.params.id,
             {
                 type,
@@ -152,7 +166,7 @@ const updateUser = async (req, res) =>{
                 lastName,
                 username,
                 password,
-                package,
+                package : packageId,
                 email,
                 expiryDate,
                 phoneNumber,
@@ -160,7 +174,6 @@ const updateUser = async (req, res) =>{
                 comment,
             },
             {new:true}
-            
         )
         if(!result){
             return res.status(404).json({success:false, message: "User not found"})

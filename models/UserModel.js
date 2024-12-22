@@ -28,7 +28,6 @@ const userSchema = new mongoose.Schema({
         enum: ["PPPoE", 'Hotspot'],
         default: 'PPPoE',
         trim: true,
-        
     },
     firstName: {
         type: String,
@@ -45,11 +44,11 @@ const userSchema = new mongoose.Schema({
     },
     
     package: {
-        type: String,
+        type:mongoose.Schema.Types.ObjectId,
+        ref: "Package",
         require: [true, "package is required"],
-        trim: true,
-        lowercase: true,
     },
+    
     email: {
         type: String,
         require: [true, "email is required"],
@@ -57,13 +56,6 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         unique: true,
         validate: [isEmail, "Please enter a valid email"]
-    },
-    expiryDate: {
-        type: Date,
-        require: [true, "expiryDate is required"],
-        trim: true,
-        lowercase: true,
-       
     },
     phoneNumber: {
         type: String,
@@ -84,9 +76,24 @@ const userSchema = new mongoose.Schema({
         trim: true,
         lowercase: true,
     },
-    isActive:{
+    isConnected:{
         type: Boolean,
         default: false,
+    },
+    connectionExpiryDate:{
+        type: Date,
+    },
+    balance:{
+        type: Number,
+        default: 0,
+    },
+    totalAmountPaid:{
+        type: Number,
+        default: 0,
+    },
+    lastReminderSent:{
+        type: Date,
+        default: null,
     }
 },
 {

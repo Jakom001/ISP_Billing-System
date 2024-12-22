@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const packageSchema = new mongoose.Schema({
     packageName: {
         type: String,
-        require: [true, "firstName is required"],
+        require: [true, "packageName is required"],
         trim: true,
         lowercase: true,
     },

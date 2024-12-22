@@ -52,7 +52,7 @@ const createPackage = async (req, res) => {
 
 const updatePackage = async (req, res) => {
     const { packageName, price, type, uploadSpeed, downloadSpeed } = req.body;
-
+    const { id } = req.params;
     try {
         const { error, value } = packageSchema.validate({ packageName, price, type, uploadSpeed, downloadSpeed });
 
@@ -60,7 +60,7 @@ const updatePackage = async (req, res) => {
             return res.status(400).json({ success: false, message: error.details[0].message });
         }
         
-        const result = await Package.findByIdAndUpdate(req.params.id, 
+        const result = await Package.findByIdAndUpdate(id, 
             {
                 packageName,
                 price,
@@ -73,7 +73,8 @@ const updatePackage = async (req, res) => {
             return res.status(404).json({ success: false, message: "Package not found" });
         }
         res.status(200).json({ success: true, message: "Package updated", data: result });
-    } catch (error) {
+    } 
+    catch (error) {
         res.status(500).json({
             success: false,
             message: "Error updating package",
