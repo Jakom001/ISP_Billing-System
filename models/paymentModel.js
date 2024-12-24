@@ -17,10 +17,11 @@ const PaymentSchema = new mongoose.Schema({
   paymentDate: {
     type: Date,
     required: [true, 'Please add a payment date'],
+    default: Date.now,
   },
   paymentStatus: {
     type: String,
-    enum: ['paid', 'unpaid'],
+    enum: ['paid', 'unpaid', 'cancelled'],
     default: 'unpaid',
     },
   paymentMethod: {

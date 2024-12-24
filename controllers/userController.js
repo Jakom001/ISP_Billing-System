@@ -4,7 +4,7 @@ const { userSchema } = require("../middlewares/validator");
 
 const getUsers = async (req, res) =>{
     try{
-        const result = await User.find()
+        const result = await User.find().populate("package")
         res.status(200).json({success:true, message: "users", data:result})
     }catch(error){
         res.status(500).json({
@@ -37,10 +37,10 @@ const addUser = async(req,res) =>{
         confirmPassword,
         packageId,
         email,
-        expiryDate,
         phoneNumber,
         address,
         comment,
+        connectionExpiryDate,
     } = req.body;
 
     
@@ -55,7 +55,7 @@ const addUser = async(req,res) =>{
                 confirmPassword,
                 packageId,
                 email,
-                expiryDate,
+                connectionExpiryDate,
                 phoneNumber,
                 address,
                 comment,
@@ -85,10 +85,10 @@ const addUser = async(req,res) =>{
                 package: packageId,
                 balance: 0,
                 email,
-                expiryDate,
                 phoneNumber,
                 address,
                 comment,
+                connectionExpiryDate,
             }
         );
         const saveUser = await user.save();
@@ -123,8 +123,8 @@ const updateUser = async (req, res) =>{
         confirmPassword,
         packageId,
         email,
-        expiryDate,
         phoneNumber,
+        connectionExpiryDate,
         address,
         comment,
     } = req.body;
@@ -139,8 +139,8 @@ const updateUser = async (req, res) =>{
                 confirmPassword,
                 packageId,
                 email,
-                expiryDate,
                 phoneNumber,
+                connectionExpiryDate,
                 address,
                 comment,
         })
@@ -167,8 +167,8 @@ const updateUser = async (req, res) =>{
                 username,
                 password,
                 package : packageId,
+                connectionExpiryDate,
                 email,
-                expiryDate,
                 phoneNumber,
                 address,
                 comment,

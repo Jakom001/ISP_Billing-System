@@ -12,13 +12,12 @@ const userSchema = Joi.object({
         .messages({ "any.only": "Passwords must match" }),
     packageId: Joi.string().required(),
     email: Joi.string().email().required(),
-    connectionExpiryDate: Joi.date().iso().required(),
+    connectionExpiryDate: Joi.date().iso().optional(),
     phoneNumber: Joi.string().min(10).required(),
     address: Joi.string().optional(),
     comment: Joi.string().optional(),
     balance: Joi.number().optional(),
     totalAmountPaid: Joi.number().optional(),
-
 })
 
 const packageSchema = Joi.object({
@@ -32,11 +31,11 @@ const packageSchema = Joi.object({
 const paymentSchema = Joi.object({
     amount: Joi.number().required(),
     paymentMethod: Joi.string().valid("cash", "bank", "mpesa").required(),
-    paymentDate: Joi.date().iso().required(),
+    paymentDate: Joi.date().iso().optional(),
     userId: Joi.string().required(),
     comment: Joi.string().optional(),
     receiptNumber: Joi.string().required(),
-    paymentStatus: Joi.string().valid("paid", "unpaid").required(),
+    paymentStatus: Joi.string().valid("paid", "unpaid", "cancelled").required(),
     checked: Joi.string().valid("yes", "no").required(),
     
 

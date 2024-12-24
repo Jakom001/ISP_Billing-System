@@ -4,6 +4,8 @@ const packageRoutes = require("./routes/packageRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const connectDB = require("./config/db");
 const cronJobs = require("./utils/cronjobs");
+const cors = require('cors');
+const helmet = require('helmet');
 
 require("dotenv").config();
 
@@ -11,6 +13,9 @@ const app = express()
 
 // Middleware
 app.use(express.json())
+app.use(cors())
+app.use(helmet())
+app.use(express.urlencoded({extended: true}));
 
 // Connect Database
 connectDB();
