@@ -1,22 +1,20 @@
-
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useContext } from 'react';
 import DataTable from 'react-data-table-component';
+import { useUserContext } from '../context/UserContext';
+
 import { 
   Eye as ViewIcon, 
   Edit as EditIcon, 
   Trash2 as DeleteIcon 
 } from 'lucide-react';
-// Sample data - replace with your actual data source
-const initialData = [
-  { packageName: "omuga", price: "073988383", downloadSpeed: "3 mbps", uploadSpeed: "3 mbps", type: "10 days from now"},
-  { packageName: "omuga", price: "073988383", downloadSpeed: "6 mbps", uploadSpeed: "3 mbps", type: "2 days from now"},
-  { packageName: "omuga", price: "073988383", downloadSpeed: "3 mbps", uploadSpeed: "3 mbps", type: "Expired"},
-  { packageName: "okinyo",price: "073988383", downloadSpeed: "10 mbps",uploadSpeed: "3 mbps",type: "Expired"},
-  { packageName: "omuga", price: "073988383", downloadSpeed: "5 mbps", uploadSpeed: "3 mbps", type: "Expired"}
-];
 
-const Packages = () => {
+
+const UsersList = () => {
+  const { users, loading, error } = useUserContext();
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   const [filterText, setFilterText] = useState('');
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
 
@@ -24,26 +22,59 @@ const Packages = () => {
   const columns = [
     
     {
-      name: 'Name',
-      selector: row => row.packageName,
+      name: 'username',
+      selector: row => row.username,
       sortable: true,
     },
     {
-      name: 'Price',
-      selector: row => row.price,
+      name: 'Phone Number',
+      selector: row => row.phoneNumber,
       sortable: true,
     },
     {
-      name: 'Download Speed',
-      selector: row => row.downloadSpeed,
+      name: 'Package',
+      selector: row => row.package.packageName,
       sortable: true,
     },
     {
-      name: 'Upload Speed',
-      selector: row => row.uploadSpeed,
+      name: 'Connection Status',
+      selector: row => row.isConnected,
       sortable: true,
+      cell: row => (
+        <span className={`px-2 py-1 rounded ${
+          row.isConnected === true
+            ? 'bg-green-100 text-green-800' 
+            :  'bg-red-100 text-red-800'
+        }`}>
+          {row.isConnected === true ? 'Connected' : 'Disconnected'}
+        </span>
+      )
     },
+
+    {
+      name: "Expiry",
+      selector: row => row.connectionExpiryDate,
+      sortable: true,
+      cell: row => {
+        const now = new Date(); // Current date and time
+        const expiryDate = new Date(row.connectionExpiryDate); // Convert to Date object
     
+        const isExpired = expiryDate < now; // Compare expiry date with current date
+    
+        return (
+          <span
+            className={`px-2 py-1 rounded ${
+              isExpired
+                ? 'bg-red-100 text-red-800' 
+                : 'bg-green-100 text-green-800' 
+            }`}
+          >
+            {isExpired ? 'Expired' : expiryDate.toLocaleDateString('en-GB')} 
+          </span>
+        );
+      }
+    },
+  
     {
       name: 'Actions',
       cell: (row) => (
@@ -82,14 +113,15 @@ const Packages = () => {
   ];
 
   // Filtering logic
-  const filteredItems = initialData.filter(
+  const filteredItems = users.filter(
     item => 
-      (item.packageName.toLowerCase().includes(filterText.toLowerCase()) ||
-       item.type.toLowerCase().includes(filterText.toLowerCase()))
+      // Text search across name, email, status
+      (item.username.toLowerCase().includes(filterText.toLowerCase()) ||
+       item.phoneNumber.toLowerCase().includes(filterText.toLowerCase()))
   );
 
   const FilterComponents = (
-    <div className="flex text-blackColor space-x-4 mb-4">
+    <div className="flex justify-end pr-8 text-blackColor space-x-4 mb-4">
       {/* Search Input */}
       <input
         type="text"
@@ -98,8 +130,6 @@ const Packages = () => {
         value={filterText}
         onChange={(e) => setFilterText(e.target.value)}
       />
-
-      
     </div>
   );
 
@@ -136,7 +166,8 @@ const Packages = () => {
   };
 
   return (
-    <div className="p-4 bg-white shadow-md rounded-lg">
+    <div className="p-4 bg-white text-blackColor shadow-md rounded-lg">
+      <h1>List of users</h1>
       {FilterComponents}
       <DataTable
         columns={columns}
@@ -151,4 +182,4 @@ const Packages = () => {
   );
 };
 
-export default Packages;
+export default UsersList;

@@ -1,17 +1,20 @@
 import React, { useState } from 'react'
+import {usePackageContext} from "../context/packageContext"
+import {addPackage} from "../api/packageApi"
+const AddPackage = () => {
+  const {setPackages} = usePackageContext();
 
-const CreatePackage = () => {
   const [formData, setFormData] = useState({
     packageName: "",
     type: "",
     price: "",
     uploadSpeed: "",
-    downloadSpeed: ""
+    downloadSpeed: "",
 })
 
   const connectionTypes = [
     {value: 'PPPoE', label: "PPPoE"},
-    {value: 'hotspot', label: "Hotspot"},
+    {value: 'Hotspot', label: "Hotspot"},
   ]
 
   const [errors, setErrors] = useState({});
@@ -63,8 +66,9 @@ const CreatePackage = () => {
 
     if(validateForm()){
       try{
-        // await axios.post('/api/subscriptions', formData);
-        console.log("Supmitted Data:", formData);
+        const {data} = await addPackage(formData);
+        setPackages((prevPackages) => [...prevPackages, data]);
+        
         setSubmitted(true)
 
         // Reset Form
@@ -79,10 +83,16 @@ const CreatePackage = () => {
         setTimeout(() =>setSubmitted(false), 3000)
       }catch (error){
         console.error("Submission Error", error)
-        setErrors(prev =>({
-            ...prev,
-            submit: 'Falied to submit form. Please try again.'
-        }))
+         const backendError =
+        error.response && error.response.data && error.response.data.message
+          ? error.response.data.message
+          : "Failed to submit form. Please try again.";
+
+      // Update the errors state with the backend error
+      setErrors((prev) => ({
+        ...prev,
+        submit: backendError,
+      }));
 
       }
     }else{
@@ -196,7 +206,6 @@ const CreatePackage = () => {
                 )}
               </div>
             
-
             <div>
               <button
                 type="submit"
@@ -205,17 +214,11 @@ const CreatePackage = () => {
                 Submit
               </button>
             </div>
-
           </form>
         </div>
       </div>
-     
-
-
-
-      
     </div>
   )
 }
 
-export default CreatePackage
+export default AddPackage

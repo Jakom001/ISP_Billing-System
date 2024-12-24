@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react';
+import { useUserContext } from '../context/userContext';
+import { addUser } from '../api/userApi';
 
-const CreateUser = () => {
+const AddUser = () => {
+  const {setUsers} = useUserContext();
     const [formData, setFormData] = useState({
         type: "",
         firstName: "",
@@ -184,8 +187,9 @@ const CreateUser = () => {
         e.preventDefault();
         if (validateForm()){
             try{
-                // await axios.post('/api/subscriptions', formData);
-                console.log("Submitted Data:", formData);
+               const {data} = await addUser(formData);
+               
+                  setUsers((prev) => [...prev, data]);
                 setSubmitted(true)
 
                 // Reset form
@@ -205,26 +209,33 @@ const CreateUser = () => {
                   });
                 // Clear success message after 3 seconds
                 setTimeout(() => setSubmitted(false), 3000)
+                
+                
             }catch (error){
-                console.error("Submission Error", error)
-                setErrors(prev =>({
-                    ...prev,
-                    submit: 'Falied to submit form. Please try again.'
-                }))
+              console.error("Submission Error", error)
+               const backendError =
+              error.response && error.response.data && error.response.data.message
+                ? error.response.data.message
+                : "Failed to submit form. Please try again.";
+      
+            // Update the errors state with the backend error
+            setErrors((prev) => ({
+              ...prev,
+              submit: backendError,
+            }));
+      
             }
-            
-
-        }else{
+          }else{
             console.log("Form has errors", errors);
-        }
-        
-    }
+           }
+  }
+      
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white text-blackColor shadow-md rounded-lg px-8 py-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Subscription Form</h2>
+            Add new user</h2>
           
           {submitted && (
             <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md">
@@ -458,7 +469,7 @@ const CreateUser = () => {
                   Custom Expiry Date
                 </label>
                 <input
-                  type="date"
+                  type="datetime-local"
                   name="expiryDate"
                   value={formData.expiryDate}
                   onChange={handleChange}
@@ -520,4 +531,4 @@ const CreateUser = () => {
   );
 };
 
-export default CreateUser
+export default AddUser
