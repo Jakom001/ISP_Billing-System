@@ -5,11 +5,11 @@ const userSchema = Joi.object({
     firstName: Joi.string().min(2).required(),
     lastName: Joi.string().min(2).required(),
     username: Joi.string().alphanum().min(3).required(),
-    password: Joi.string().min(6).required(),
-    confirmPassword: Joi.string()
-        .valid(Joi.ref("password"))
+    userPaass: Joi.string().min(6).required(),
+    confirmUserPaass: Joi.string()
+        .valid(Joi.ref("userPaass"))
         .required()
-        .messages({ "any.only": "Passwords must match" }),
+        .messages({ "any.only": "Password must match" }),
     packageId: Joi.string().required(),
     email: Joi.string().email().required(),
     connectionExpiryDate: Joi.date().iso().optional(),
@@ -35,7 +35,6 @@ const paymentSchema = Joi.object({
     userId: Joi.string().required(),
     comment: Joi.string().optional(),
     receiptNumber: Joi.string().required(),
-    paymentStatus: Joi.string().valid("paid", "unpaid", "cancelled").required(),
     checked: Joi.string().valid("yes", "no").required(),
     
 

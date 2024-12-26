@@ -1,6 +1,5 @@
 const { timeStamp } = require("console");
 const mongoose = require("mongoose");
-const moment = require('moment-timezone');
 const {isEmail} = require("validator")
 
 const userSchema = new mongoose.Schema({
@@ -36,12 +35,12 @@ const userSchema = new mongoose.Schema({
         trim: true,
         lowercase: true,
     },
-    password: {
+    userPassw: {
         type: String,
-        require: [true, "ConfirmPassword is required"],
+        require: [true, "UserPassword is required"],
         trim: true,
         select:false,
-        minlength: [6, "password must be atleast 8 characters"]
+        minlength: [6, "UserPassowrd must be atleast 8 characters"]
     },
     
     package: {
@@ -83,6 +82,7 @@ const userSchema = new mongoose.Schema({
     },
     connectionExpiryDate:{
         type: Date,
+        default: null,
     },
     balance:{
         type: Number,

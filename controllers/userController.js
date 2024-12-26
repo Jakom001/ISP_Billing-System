@@ -4,7 +4,10 @@ const { userSchema } = require("../middlewares/validator");
 
 const getUsers = async (req, res) =>{
     try{
-        const result = await User.find().populate("package")
+        const result = await User.find().populate({
+            path: "package",
+            select: "packageName"
+        })
         res.status(200).json({success:true, message: "users", data:result})
     }catch(error){
         res.status(500).json({
@@ -33,8 +36,8 @@ const addUser = async(req,res) =>{
         firstName,
         lastName,
         username,
-        password,
-        confirmPassword,
+        userPaass,
+        confirmUserPaass,
         packageId,
         email,
         phoneNumber,
@@ -43,16 +46,14 @@ const addUser = async(req,res) =>{
         connectionExpiryDate,
     } = req.body;
 
-    
-
     try {
         const {error, value} = userSchema.validate({
             type,
                 firstName,
                 lastName,
                 username,
-                password,
-                confirmPassword,
+                userPaass,
+                confirmUserPaass,
                 packageId,
                 email,
                 connectionExpiryDate,
@@ -81,7 +82,7 @@ const addUser = async(req,res) =>{
                 firstName,
                 lastName,
                 username,
-                password,
+                userPaass,
                 package: packageId,
                 balance: 0,
                 email,
@@ -119,8 +120,8 @@ const updateUser = async (req, res) =>{
         firstName,
         lastName,
         username,
-        password,
-        confirmPassword,
+        userPaass,
+        confirmUserPaass,
         packageId,
         email,
         phoneNumber,
@@ -135,8 +136,8 @@ const updateUser = async (req, res) =>{
                 firstName,
                 lastName,
                 username,
-                password,
-                confirmPassword,
+                userPaass,
+                confirmUserPaass,
                 packageId,
                 email,
                 phoneNumber,
@@ -165,7 +166,7 @@ const updateUser = async (req, res) =>{
                 firstName,
                 lastName,
                 username,
-                password,
+                userPaass,
                 package : packageId,
                 connectionExpiryDate,
                 email,

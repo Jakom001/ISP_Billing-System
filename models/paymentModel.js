@@ -12,6 +12,7 @@ const PaymentSchema = new mongoose.Schema({
   },
   receiptNumber: {
     type: String,
+    unique: true,
     required: [true, 'Please add a receipt number'],
   },
   paymentDate: {
@@ -19,11 +20,6 @@ const PaymentSchema = new mongoose.Schema({
     required: [true, 'Please add a payment date'],
     default: Date.now,
   },
-  paymentStatus: {
-    type: String,
-    enum: ['paid', 'unpaid', 'cancelled'],
-    default: 'unpaid',
-    },
   paymentMethod: {
     type: String,
     enum: ['cash', 'mpesa', 'bank'],

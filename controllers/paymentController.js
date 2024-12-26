@@ -5,7 +5,10 @@ const { paymentSchema } = require("../middlewares/validator")
 
 const getPayments = async (req, res) => {
     try {
-        const result = await Payment.find();
+        const result = await Payment.find().populate({
+            path: "user",
+            select: "username phoneNumber",
+        });
         res.status(200).json({ success: true, message: "payments", data: result });
     } catch (error) {
         res.status(500).json({
@@ -24,7 +27,6 @@ const createPayment = async (req, res) => {
          userId,
          comment,
          receiptNumber,
-         paymentStatus,
          checked,
    } = req.body;
 
@@ -36,7 +38,6 @@ const createPayment = async (req, res) => {
         userId,
         comment,
         receiptNumber,
-        paymentStatus,
         checked,
     });
 
@@ -56,7 +57,6 @@ const createPayment = async (req, res) => {
             user: userId,
             comment,
             receiptNumber,
-            paymentStatus: "paid",
             checked,
         }
     );
@@ -69,9 +69,7 @@ const createPayment = async (req, res) => {
     user.connectionExpiryDate = connectionExpiry;
     await user.save();
 
-    res.status(201).json({ success: true, message: "Payment processed", data: result });
-
-    
+    res.status(201).json({ success: true, message: "Payment processed", data: result });    
     
    }
     catch (error) {
@@ -91,7 +89,6 @@ const updatePayment = async (req, res) => {
         userId,
         comment,
         receiptNumber,
-        paymentStatus,
         checked,
     } = req.body;
 
@@ -103,7 +100,6 @@ const updatePayment = async (req, res) => {
             userId,
             comment,
             receiptNumber,
-            paymentStatus,
             checked,
         });
 
@@ -123,7 +119,6 @@ const updatePayment = async (req, res) => {
                 user: userId,
                 comment,
                 receiptNumber,
-                paymentStatus: "paid",
                 checked,
             },
             { new: true });
