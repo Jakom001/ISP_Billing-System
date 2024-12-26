@@ -78,8 +78,8 @@ const AddPackage = () => {
           price: "",
           uploadSpeed: "",
           downloadSpeed: ""
-
         })
+
         setTimeout(() =>setSubmitted(false), 3000)
       }catch (error){
         console.error("Submission Error", error)
@@ -135,6 +135,7 @@ const AddPackage = () => {
                   <p className="mt-1 text-sm text-red-600">{errors.packageName}</p>
                 )}
              </div>
+             
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1' htmlFor="type">
                 Connection Type</label>

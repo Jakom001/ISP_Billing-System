@@ -1,6 +1,6 @@
 import apiClient from "../services/apiClient";
 
-export const fetchUsers = () => apiClient.get("/users/all-users");
+export const getUsers = () => apiClient.get("/users/all-users");
 export const addUser = (userData) => apiClient.post("/users/add-user", userData);
 
 // Update a user  by id

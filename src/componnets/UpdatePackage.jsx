@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { usePackageContext } from "../context/packageContext";
+import { usePackageContext } from "../context/PackageContext";
 import { updatePackage, getPackageById } from "../api/packageApi";
 import { useParams, useNavigate, Link } from 'react-router-dom';
 

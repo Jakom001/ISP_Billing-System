@@ -1,113 +1,136 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
-import { usePackageContext } from '../context/PackageContext';
-import {useNavigate} from 'react-router-dom'
-import { deletePackage } from '../api/packageApi';
+import { usePaymentContext } from '../context/PaymentContext';
+import { useNavigate } from 'react-router-dom';
+import { deletePayment } from '../api/paymentApi';
 
 import { 
   Eye as ViewIcon, 
   Edit as EditIcon, 
   Trash2 as DeleteIcon 
 } from 'lucide-react';
-const PackagesList = () => {
+
+const PaymentsList = () => {
   const navigate = useNavigate();
-  const { packages, loading, error, fetchPackages, } = usePackageContext();
+  const { payments, loading, error, fetchPayments } = usePaymentContext();
 
   const [filterText, setFilterText] = useState('');
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [packageToDelete, setPackageToDelete] = useState(null);
-  
+  const [paymentToDelete, setPaymentToDelete] = useState(null);
   const [deleted, setDeleted] = useState(false);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    fetchPackages();
-  }, [fetchPackages]);
+    fetchPayments();
+  }, [fetchPayments]);
+  // console.log(payments)
 
-  const handleEdit = (packageId) => {
-    navigate(`/packages/update/${packageId}`);
+  const handleEdit = (paymentId) => {
+    navigate(`/payments/update/${paymentId}`);
   };
 
-  const handleDelete = (packageId) => {
-    const packageToDelete = packages.find(pkg => pkg._id === packageId);
-    setPackageToDelete(packageToDelete);
+  const handleDelete = (paymentId) => {
+    const paymentToDelete = payments.find(payment => payment._id === paymentId);
+    setPaymentToDelete(paymentToDelete);
     setIsDeleteModalOpen(true);
   };
 
   const confirmDelete = async () => {
-    if (packageToDelete) {
+    if (paymentToDelete) {
       try {
-        await deletePackage(packageToDelete._id);
+        await deletePayment(paymentToDelete._id);
         setDeleted(true);
-        fetchPackages(); 
-        setTimeout(() =>setDeleted(false), 3000)
+        fetchPayments();
+        setTimeout(() => setDeleted(false), 3000);
       } catch (error) {
-        console.error("Deletion Error", error)
-         const backendError =
-        error.response && error.response.data && error.response.data.message
-          ? error.response.data.message
-          : "Failed to delete the item. Please try again.";
+        console.error("Deletion Error", error);
+        const backendError =
+          error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "Failed to delete the item. Please try again.";
 
-      // Update the errors state with the backend error
-      setErrors((prev) => ({
-        ...prev,
-        delete: backendError,
-      }));
-
+        // Update the errors state with the backend error
+        setErrors((prev) => ({
+          ...prev,
+          delete: backendError,
+        }));
       }
     }
     setIsDeleteModalOpen(false);
-    setPackageToDelete(null);
+    setPaymentToDelete(null);
   };
+
   // Define columns
   const columns = [
     {
       name: '#',
       selector: (row, index) => index + 1,
-      
     },
     {
-      name: 'Name',
-      selector: row => row.packageName,
+      name: 'User',
+      selector: row => row.user.username,
       sortable: true,
     },
     {
-      name: 'Price',
-      selector: row => row.price,
+      name: 'Phone Number',
+      selector: row => row.user.phoneNumber,
       sortable: true,
     },
     {
-      name: 'Download Speed',
-      selector: row => row.downloadSpeed,
+      name: 'Amount',
+      selector: row => row.amount,
       sortable: true,
     },
     {
-      name: 'Upload Speed',
-      selector: row => row.uploadSpeed,
+      name: 'Receipt',
+      selector: row => row.receiptNumber,
       sortable: true,
     },
     {
-      name: 'Type',
-      selector: row => row.type,
+      name: 'Payment Method',
+      selector: row => row.paymentMethod,
       sortable: true,
     },
+    {
+      name: 'Checked',
+      selector: row => row.checked,
+      sortable: true,
+      cell: row => (
+        <span className={`px-2 py-1 rounded ${
+          row.checked === "yes"
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-red-100 text-red-800'
+        }`}>
+          {row.checked}
+        </span>
+      )
+    },
+    
     {
       name: 'Actions',
       cell: (row) => (
         <div className="flex space-x-2">
-          <button
+          {/* <button 
+            onClick={() => handleView(row._id)}
+            className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-100"
+            title="View Payment"
+          >
+            <ViewIcon size={20} />
+          </button> */}
+
+          <button 
             onClick={() => handleEdit(row._id)}
             className="text-green-500 hover:text-green-700 p-1 rounded-full hover:bg-green-100"
-            title="Edit Package"
+            title="Edit Payment"
           >
             <EditIcon size={20} />
           </button>
-          <button
+
+          <button 
             onClick={() => handleDelete(row._id)}
             className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100"
-            title="Delete Package"
-
+            title="Delete Payment"
           >
             <DeleteIcon size={20} />
           </button>
@@ -115,29 +138,32 @@ const PackagesList = () => {
       ),
       width: '120px',
       center: true,
-    },
+    }
   ];
 
   // Filtering logic
   const filteredItems = useMemo(() => {
-    if (!Array.isArray(packages)) {
-      console.error('Packages is not an array:', packages);
+    if (!Array.isArray(payments)) {
+      console.error('Payments is not an array:', payments);
       return [];
     }
-    return packages.filter(item => {
+    return payments.filter(item => {
       if (!item || typeof item !== 'object') {
-        console.error('Invalid package item:', item);
+        console.error('Invalid payment item:', item);
         return false;
       }
-      const packageNameMatch = item.packageName && typeof item.packageName === 'string'
-        ? item.packageName.toLowerCase().includes(filterText.toLowerCase())
+      const usernameMatch = item.user.username && typeof item.user.username === 'string'
+        ? item.user.username.toLowerCase().includes(filterText.toLowerCase())
         : false;
-      const typeMatch = item.type && typeof item.type === 'string'
-        ? item.type.toLowerCase().includes(filterText.toLowerCase())
+      const receiptNumberMatch = item.receiptNumber && typeof item.receiptNumber === 'string'
+        ? item.receiptNumber.toLowerCase().includes(filterText.toLowerCase())
         : false;
-      return packageNameMatch || typeMatch;
+        const phoneNumberMatch = item.user.phoneNumber && typeof item.user.phoneNumber === 'string'
+        ? item.user.phoneNumber.toLowerCase().includes(filterText.toLowerCase())
+        : false;
+      return usernameMatch || receiptNumberMatch || phoneNumberMatch;
     });
-  }, [packages, filterText]);
+  }, [payments, filterText]);
 
   const FilterComponents = (
     <div className="flex justify-end pr-8 text-blackColor space-x-4 mb-4">
@@ -189,9 +215,9 @@ const PackagesList = () => {
       {error && <p>Error: {error}</p>}
       {!loading && !error && (
         <>
-         {deleted && (
+          {deleted && (
             <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md">
-              Package deleted successfully!
+              Payment deleted successfully!
             </div>
           )}
           {errors.delete && (
@@ -199,9 +225,9 @@ const PackagesList = () => {
               {errors.delete}
             </div>
           )}
-          <h1>List of Packages</h1>
+          <h1>List of Payments</h1>
           {FilterComponents}
-          {Array.isArray(packages) && packages.length > 0 ? (
+          {Array.isArray(payments) && payments.length > 0 ? (
             <DataTable
               columns={columns}
               data={filteredItems}
@@ -212,7 +238,7 @@ const PackagesList = () => {
               striped
             />
           ) : (
-            <p>No packages available.</p>
+            <p>No payments available.</p>
           )}
         </>
       )}
@@ -222,7 +248,7 @@ const PackagesList = () => {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
           <div className="bg-white p-5 rounded-lg shadow-xl">
             <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
-            <p>Are you sure you want to delete the package <b>"{packageToDelete?.packageName}"?</b> </p>
+            <p>Are you sure you want to delete the payment <b>"{paymentToDelete?.user.username}"</b>?</p>
             <div className="mt-4 flex justify-end space-x-3">
               <button
                 onClick={() => setIsDeleteModalOpen(false)}
@@ -241,8 +267,7 @@ const PackagesList = () => {
         </div>
       )}
     </div>
-
   );
 };
 
-export default PackagesList;
+export default PaymentsList;

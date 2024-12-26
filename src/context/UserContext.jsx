@@ -1,46 +1,33 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import { fetchUsers } from '../api/userApi';
 
+import React, { createContext, useState, useContext, useCallback } from 'react';
+import { getUsers } from '../api/userApi';
 
 const UserContext = createContext();
-
-export const UserContextProvider = ({children}) => {
+export const UserContextProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const loadUsers = async () => {
-      setLoading(true);
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await getUsers();
+      setUsers(response.data.data);
       setError(null);
-
-      try{
-        const response = await fetchUsers();
-        setUsers(response.data.data);
-        console.log("Fetched users:", response);
-      }catch (error){
-        console.error("Error fetching users:", error.message);
-      }finally{
-        setLoading(false);
-      }
-  };
-  loadUsers();
+    } catch (err) {
+      setError('Failed to fetch users');
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-
-  const addUser = (newUser) => {
-    setUsers((prevUsers) => [...prevUsers, newUser]);
-  };
-
-
-
-
   return (
-    <UserContext.Provider value={{users, setUsers, addUser, loading, error}}>
+    <UserContext.Provider value={{ users, setUsers, loading, error, fetchUsers }}>
       {children}
     </UserContext.Provider>
-  )
-}
+  );
+};
 
 export const useUserContext = () => {
   const context = useContext(UserContext);
