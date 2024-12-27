@@ -24,7 +24,7 @@ const UpdatePayment = () => {
   
   const paymentMethods = [
     {value: 'cash', label: "Cash"},
-    {value: 'card', label: "Card"},
+    {value: 'bank', label: "Bank"},
     {value: 'mpesa', label: "M-pesa"},
   ]
 
@@ -58,8 +58,6 @@ const UpdatePayment = () => {
     fetchPaymentDetails();
   }, [id]);
 
-
-
   const { users, fetchUsers } = useUserContext();
     
     useEffect(() => {
@@ -80,7 +78,7 @@ const UpdatePayment = () => {
       }
       if (!formData.paymentMethod){
           newErrors.paymentMethod = "Payment method is required"
-      }else if(!["cash", "card", "mpesa"].includes(formData.paymentMethod)){
+      }else if(!["cash", "bank", "mpesa"].includes(formData.paymentMethod)){
           newErrors.paymentMethod = "Invalid payment method"
       }
   

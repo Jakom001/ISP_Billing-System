@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import {usePackageContext} from "../context/packageContext"
 import {addPackage} from "../api/packageApi"
+import { Link } from 'react-router-dom'
 const AddPackage = () => {
   const {setPackages} = usePackageContext();
 
@@ -207,13 +208,18 @@ const AddPackage = () => {
                 )}
               </div>
             
-            <div>
+              <div className="flex justify-between">
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                className=" bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
               >
-                Submit
+                Add Package
               </button>
+
+              <button className="mt-4">
+                <Link to="/packages" className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">Cancel</Link>
+              </button>
+
             </div>
           </form>
         </div>

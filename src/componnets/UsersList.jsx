@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import { useUserContext } from '../context/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { deleteUser } from '../api/userApi';
 
 import { 
@@ -178,8 +178,13 @@ const UsersList = () => {
     });
   }, [users, filterText]);
 
+ 
   const FilterComponents = (
     <div className="flex justify-end pr-8 text-blackColor space-x-4 mb-4">
+    <button>
+      <Link to="/users/add" className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">Add User</Link>
+    </button>
+  
       <input
         type="text"
         placeholder="Search..."

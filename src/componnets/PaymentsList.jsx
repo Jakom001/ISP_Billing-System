@@ -3,6 +3,7 @@ import DataTable from 'react-data-table-component';
 import { usePaymentContext } from '../context/PaymentContext';
 import { useNavigate } from 'react-router-dom';
 import { deletePayment } from '../api/paymentApi';
+import { Link } from 'react-router-dom';
 
 import { 
   Eye as ViewIcon, 
@@ -93,6 +94,11 @@ const PaymentsList = () => {
       sortable: true,
     },
     {
+      name: 'Payment Date',
+      selector: row => row.paymentDate,
+      sortable: true,
+    },
+    {
       name: 'Checked',
       selector: row => row.checked,
       sortable: true,
@@ -152,21 +158,38 @@ const PaymentsList = () => {
         console.error('Invalid payment item:', item);
         return false;
       }
-      const usernameMatch = item.user.username && typeof item.user.username === 'string'
+      const usernameMatch = item.user && item.user.username && typeof item.user.username === 'string'
         ? item.user.username.toLowerCase().includes(filterText.toLowerCase())
+        : false;
+      const phoneNumberMatch = item.user && item.user.phoneNumber && typeof item.user.phoneNumber === 'string'
+        ? item.user.phoneNumber.toLowerCase().includes(filterText.toLowerCase())
+        : false;
+      const amountMatch = item.amount && typeof item.amount === 'number'
+        ? item.amount.toString().includes(filterText)
         : false;
       const receiptNumberMatch = item.receiptNumber && typeof item.receiptNumber === 'string'
         ? item.receiptNumber.toLowerCase().includes(filterText.toLowerCase())
         : false;
-        const phoneNumberMatch = item.user.phoneNumber && typeof item.user.phoneNumber === 'string'
-        ? item.user.phoneNumber.toLowerCase().includes(filterText.toLowerCase())
+      const paymentMethodMatch = item.paymentMethod && typeof item.paymentMethod === 'string'
+        ? item.paymentMethod.toLowerCase().includes(filterText.toLowerCase())
         : false;
-      return usernameMatch || receiptNumberMatch || phoneNumberMatch;
+      const paymentDateMatch = item.paymentDate && typeof item.paymentDate === 'string'
+        ? item.paymentDate.toLowerCase().includes(filterText.toLowerCase())
+        : false;
+      const checkedMatch = item.checked && typeof item.checked === 'string'
+        ? item.checked.toLowerCase().includes(filterText.toLowerCase())
+        : false;
+
+      return usernameMatch || phoneNumberMatch || amountMatch || receiptNumberMatch || paymentMethodMatch || paymentDateMatch || checkedMatch;
     });
   }, [payments, filterText]);
 
+
   const FilterComponents = (
     <div className="flex justify-end pr-8 text-blackColor space-x-4 mb-4">
+      <button>
+      <Link to="/payments/add" className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">Add Payment</Link>
+    </button>
       <input
         type="text"
         placeholder="Search..."

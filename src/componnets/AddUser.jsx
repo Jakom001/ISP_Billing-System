@@ -3,6 +3,7 @@ import {useUserContext} from "../context/UserContext"
 import { Eye, EyeOff } from 'lucide-react';
 import {addUser} from "../api/userApi"
 import { usePackageContext } from '../context/packageContext';
+import { Link } from 'react-router-dom';
 
 const AddUser = () => {
   const {setUsers} = useUserContext();
@@ -493,14 +494,18 @@ if (preset === 'custom') {
               />
             </div>
               
-            
-            <div>
+            <div className="flex justify-between">
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                className=" bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
               >
-                Submit
+                Add User
               </button>
+
+              <button className="mt-4">
+                <Link to="/users" className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">Cancel</Link>
+              </button>
+              
             </div>
           </form>
         </div>

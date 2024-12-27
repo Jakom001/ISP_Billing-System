@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import {usePaymentContext} from "../context/PaymentContext"
 import { Eye, EyeOff } from 'lucide-react';
 import {addPayment} from "../api/paymentApi"
-import { useUserContext } from '../context/userContext';
+import { useUserContext } from '../context/UserContext';
+import { Link } from 'react-router-dom';
 
 const AddPayment = () => {
   const {setPayments} = usePaymentContext();
@@ -26,7 +27,7 @@ const AddPayment = () => {
   
   const paymentMethods = [
     {value: 'cash', label: "Cash"},
-    {value: 'card', label: "Card"},
+    {value: 'bank', label: "Bank"},
     {value: 'mpesa', label: "M-pesa"},
   ]
 
@@ -49,7 +50,7 @@ const AddPayment = () => {
     }
     if (!formData.paymentMethod){
         newErrors.paymentMethod = "Payment method is required"
-    }else if(!["cash", "card", "mpesa"].includes(formData.paymentMethod)){
+    }else if(!["cash", "bank", "mpesa"].includes(formData.paymentMethod)){
         newErrors.paymentMethod = "Invalid payment method"
     }
 
@@ -201,8 +202,18 @@ const handleChange = (e) =>{
                     <textarea name="comment" id="comment" value={formData.comment} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md" />
                     {errors.comment && <p className="text-red-500">{errors.comment}</p>}
                 </div>
-                <div>
-                    <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">Create Payment</button>
+                <div className="flex justify-between">
+                  <button
+                    type="submit"
+                    className=" bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                  >
+                    Add Payment
+                  </button>
+    
+                  <button className="mt-4">
+                    <Link to="/payments" className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">Cancel</Link>
+                  </button>
+                  
                 </div>
 
             </form>

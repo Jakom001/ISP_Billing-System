@@ -3,6 +3,7 @@ import DataTable from 'react-data-table-component';
 import { usePackageContext } from '../context/PackageContext';
 import {useNavigate} from 'react-router-dom'
 import { deletePackage } from '../api/packageApi';
+import { Link } from 'react-router-dom';
 
 import { 
   Eye as ViewIcon, 
@@ -141,6 +142,9 @@ const PackagesList = () => {
 
   const FilterComponents = (
     <div className="flex justify-end pr-8 text-blackColor space-x-4 mb-4">
+      <button>
+      <Link to="/packages/add" className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">Add Package</Link>
+    </button>
       <input
         type="text"
         placeholder="Search..."
