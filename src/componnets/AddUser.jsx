@@ -22,7 +22,6 @@ const AddUser = () => {
     confirmUserPaass:"",
     packageId:"",
     email: "",
-    connectionExpiryDate:'',
     phoneNumber:"",
     address:"",
     comment:"",
@@ -31,49 +30,6 @@ const AddUser = () => {
   const [submitted, setSubmitted] = useState(false);
   const [showUserPaass, setShowUserPaass] = useState(false);
   const [showConfirmUserPaass, setShowConfirmUserPaass] = useState(false);
-
-  const presetDates = [
-    { value: "3day", label: "3 Days" },
-    { value: "1week", label: "1 Week" },
-    { value: "2weeks", label: "2 Weeks" },
-    { value: "1month", label: "1 Month" },
-    { value: "2months", label: "2 Months" },
-    { value: "1year", label: "1 Year" },
-    { value: "custom", label: "Custom Date" }
-  ];
-
-  const calculateExpiryDate = (preset) => {
-    const today = new Date();
-    let connectionExpiryDate = new Date();
-    connectionExpiryDate.setHours(23, 59, 0, 0);
-    switch (preset) {
-      case "3days":
-        connectionExpiryDate.setDate(today.getDate() + 3);
-        break;
-      case "1week":
-        connectionExpiryDate.setDate(today.getDate() + 7);
-        break;
-      case "2weeks":
-        connectionExpiryDate.setDate(today.getDate() + 14);
-        break;
-      case "1month":
-        connectionExpiryDate.setMonth(today.getMonth() + 1);
-        break;
-      case "2months":
-        connectionExpiryDate.setMonth(today.getMonth() + 2);
-        break;
-      case "1year":
-        connectionExpiryDate.setFullYear(today.getFullYear() + 1);
-        break;
-      default:
-        return "";
-    }
-
-    return connectionExpiryDate.toISOString().split('T')[0];
-  };
-
-const [dateInputType, setDateInputType] = useState('preset');
-const [selectedPreset, setSelectedPreset] = useState('');
 
 const handlePresetChange = (e) => {
 const preset = e.target.value;
@@ -142,15 +98,7 @@ if (preset === 'custom') {
         newErrors.packageId = 'Please select a package';
     }
 
-    if (!formData.connectionExpiryDate) {
-        newErrors.connectionExpiryDate = 'Expiry date is required';
-    } else {
-        const selectedDate = new Date(formData.connectionExpiryDate);
-        const today = new Date();
-        if (selectedDate < today) {
-            newErrors.connectionExpiryDate = 'Expiry date cannot be in the past';
-        }
-    }
+    
     if (!formData.phoneNumber) {
         newErrors.phoneNumber = 'Phone number is required';
     } else if (!/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ''))) {
@@ -199,7 +147,6 @@ if (preset === 'custom') {
           confirmUserPaass: "",
           packageId: "",
           email: "",
-          connectionExpiryDate: "",
           phoneNumber: "",
           address: "",
           comment: "",
@@ -425,45 +372,7 @@ if (preset === 'custom') {
               )}
             </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Expiry Date
-              </label>
-              <select
-                value={selectedPreset}
-                onChange={handlePresetChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select duration</option>
-                {presetDates.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {dateInputType === 'custom' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Custom Expiry Date
-                </label>
-                <input
-                  type="datetime-local"
-                  name="connectionExpiryDate"
-                  value={formData.connectionExpiryDate}
-                  onChange={handleChange}
-                  min={new Date().toISOString().slice(0, 16)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            )}
-            
-            {errors.connectionExpiryDate && (
-              <p className="mt-1 text-sm text-red-600">{errors.connectionExpiryDate}</p>
-            )}
-          </div>
+          
 
           <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

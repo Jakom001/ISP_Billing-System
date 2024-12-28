@@ -95,7 +95,14 @@ const PaymentsList = () => {
     },
     {
       name: 'Payment Date',
-      selector: row => row.paymentDate,
+      selector: row => new Date(row.paymentDate).toLocaleString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true
+      }),
       sortable: true,
     },
     {
@@ -233,7 +240,7 @@ const PaymentsList = () => {
   };
 
   return (
-    <div className="p-4 bg-white text-blackColor shadow-md rounded-lg">
+    <div className=" bg-white text-blackColor shadow-md rounded-lg">
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}
       {!loading && !error && (
@@ -248,7 +255,7 @@ const PaymentsList = () => {
               {errors.delete}
             </div>
           )}
-          <h1>List of Payments</h1>
+          <h1 className='p-4 font-bold text-lg'>List of Payments</h1>
           {FilterComponents}
           {Array.isArray(payments) && payments.length > 0 ? (
             <DataTable
@@ -261,7 +268,7 @@ const PaymentsList = () => {
               striped
             />
           ) : (
-            <p>No payments available.</p>
+            <p className='p-4'>No payments available.</p>
           )}
         </>
       )}

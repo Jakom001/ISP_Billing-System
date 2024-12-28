@@ -105,11 +105,10 @@ const UsersList = () => {
       selector: row => row.connectionExpiryDate,
       sortable: true,
       cell: row => {
-        const now = new Date(); // Current date and time
-        const expiryDate = new Date(row.connectionExpiryDate); // Convert to Date object
+        const now = new Date(); 
+        const expiryDate = new Date(row.connectionExpiryDate); 
     
-        const isExpired = expiryDate < now; // Compare expiry date with current date
-    
+        const isExpired = expiryDate < now;
         return (
           <span
             className={`px-2 py-1 rounded ${
@@ -118,7 +117,7 @@ const UsersList = () => {
                 : 'bg-green-100 text-green-800' 
             }`}
           >
-            {isExpired ? 'Expired' : expiryDate.toLocaleDateString('en-GB')} 
+            {isExpired ? 'Expired' : expiryDate.toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}
           </span>
         );
       }
@@ -228,7 +227,7 @@ const UsersList = () => {
   };
 
   return (
-    <div className="p-4 bg-white text-blackColor shadow-md rounded-lg">
+    <div className="p-1 bg-white text-blackColor shadow-md rounded-lg">
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}
       {!loading && !error && (
@@ -243,7 +242,7 @@ const UsersList = () => {
               {errors.delete}
             </div>
           )}
-          <h1>List of Users</h1>
+          <h1 className='p-4 font-bold text-lg'>List of Users</h1>
           {FilterComponents}
           {Array.isArray(users) && users.length > 0 ? (
             <DataTable
@@ -256,7 +255,7 @@ const UsersList = () => {
               striped
             />
           ) : (
-            <p>No users available.</p>
+            <p className='p-4'>No users available.</p>
           )}
         </>
       )}

@@ -183,7 +183,7 @@ const handleChange = (e) =>{
                 </div>
                 <div>
                     <label htmlFor="paymentDate" className="block text-sm font-medium text-gray-700">Payment Date</label>
-                    <input type="datetime-local"  min={new Date().toISOString().slice(0, 16)} name="paymentDate" id="paymentDate" value={formData.paymentDate} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md" />
+                    <input type="datetime-local"  name="paymentDate" id="paymentDate" value={formData.paymentDate} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md" />
                     {errors.paymentDate && <p className="text-red-500">{errors.paymentDate}</p>}
                 </div>
                

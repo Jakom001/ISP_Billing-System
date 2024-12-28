@@ -203,7 +203,7 @@ const PackagesList = () => {
               {errors.delete}
             </div>
           )}
-          <h1>List of Packages</h1>
+          <h1 className='p-4 font-bold text-lg'>List of Packages</h1>
           {FilterComponents}
           {Array.isArray(packages) && packages.length > 0 ? (
             <DataTable
@@ -216,7 +216,7 @@ const PackagesList = () => {
               striped
             />
           ) : (
-            <p>No packages available.</p>
+            <p className='p-4'>No packages available.</p>
           )}
         </>
       )}
