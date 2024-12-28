@@ -43,7 +43,6 @@ const addUser = async(req,res) =>{
         phoneNumber,
         address,
         comment,
-        connectionExpiryDate,
     } = req.body;
 
     try {
@@ -56,7 +55,6 @@ const addUser = async(req,res) =>{
                 confirmUserPaass,
                 packageId,
                 email,
-                connectionExpiryDate,
                 phoneNumber,
                 address,
                 comment,
@@ -89,7 +87,6 @@ const addUser = async(req,res) =>{
                 phoneNumber,
                 address,
                 comment,
-                connectionExpiryDate,
             }
         );
         const saveUser = await user.save();

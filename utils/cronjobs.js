@@ -5,23 +5,22 @@ const Package = require("../models/packageModel");
 const checkAndDeductUserBalance = async () => {
     try{
         const now = new Date();
+        now.setHours(23, 59, 59, 999); 
 
         const expiredUsers = await User.find({
-            connectionExpiryDate: {$lte: now},
+            connectionExpiryDate: { $lte: now }
+        }).populate({
+            path: "package",
+            select: "price"
         });
-        
+    
         if (expiredUsers.length === 0){
             console.log("No users found with expired connection date");
             return;
         }
 
         for (const user of expiredUsers){
-            const package = Package.findById(user.package);
-            if (!package){
-                console.log(`Package not found for user ${user.username}`);
-                continue;
-            }
-            const packagePrice = package.price;
+            const packagePrice = user.package.price;
 
             if (user.balance >= packagePrice){
                 user.balance -= packagePrice;
@@ -43,11 +42,12 @@ const checkAndDeductUserBalance = async () => {
 };
 
 const initializeCronjobs = () => {
-    // Run the checkUserConnection function every 10 minute
-    cron.schedule("*/500 * * * *", async () => {
+    // Run the checkUserConnection function every day at 11:57 PM
+    cron.schedule("57 23 * * *", async () => {
         console.log("Running connection check and balance deduction");
         await checkAndDeductUserBalance();
     });       
 };
+
 
 module.exports = {initializeCronjobs};

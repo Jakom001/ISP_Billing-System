@@ -45,8 +45,11 @@ const createPayment = async (req, res) => {
         return res.status(400).json({ success: false, message: error.details[0].message });
     }
     
-    const user = await User.findById(userId);
-    if (!user) {
+    const payingUser = await User.findById(userId).populate({
+        path: "package",
+        select: "price",
+    });
+    if (!payingUser) {
         return res.status(404).json({ success: false, message: "User not found" });
     }
     const payment = new Payment(
@@ -61,13 +64,19 @@ const createPayment = async (req, res) => {
         }
     );
     const result = await payment.save();
-    const connectionExpiry = new Date(paymentDate);
-    connectionExpiry.setDate(connectionExpiry.getDate() + 30);
-    user.isConnected = true;
-    user.balance += amount;
-    user.totalAmountPaid += amount;
-    user.connectionExpiryDate = connectionExpiry;
-    await user.save();
+    payingUser.balance +=  Number(amount);
+    payingUser.totalAmountPaid +=  Number(amount);
+
+    if (payingUser.balance >= payingUser.package.price && (!payingUser.connectionExpiryDate || payingUser.connectionExpiryDate < new Date())) {
+        payingUser.balance -= payingUser.package.price;
+
+        const now = new Date();
+        now.setHours(23, 59, 59, 999);
+        payingUser.connectionExpiryDate = new Date(now.setDate(now.getDate() + 30));
+        payingUser.isConnected = true;
+    }
+    
+    await payingUser.save();
 
     res.status(201).json({ success: true, message: "Payment processed", data: result });    
     

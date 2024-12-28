@@ -37,6 +37,5 @@ app.listen(4000, () =>{
     console.log("Server running in port 4000")
 })
 
-
 // initialize cron jobs
-// cronJobs.initializeCronjobs() 
+cronJobs.initializeCronjobs() 
