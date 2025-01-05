@@ -2,13 +2,16 @@ require('dotenv').config()
 const Package = require("../models/packageModel");
 const RouterOSAPI = require('node-routeros').RouterOSAPI;
 const {packageSchema} = require("../middlewares/validator");
+const mongoose = require("mongoose");
 
-const connection = new RouterOSAPI({
-    host: process.env.MIKROTIK_HOST,
-    user: process.env.MIKROTIK_USER,
-    password: process.env.MIKROTIK_PASSWORD,
-    port: process.env.MIKROTIK_PORT,
-});
+function getRouterConnection(){
+    return  new RouterOSAPI({
+        host: process.env.MIKROTIK_HOST,
+        user: process.env.MIKROTIK_USER,
+        password: process.env.MIKROTIK_PASSWORD,
+        port: process.env.MIKROTIK_PORT,
+    });
+}
 
 const getPackages = async (req, res) => {
     try {
@@ -43,7 +46,6 @@ const createPackage = async (req, res) => {
     const { packageName, price, type, uploadSpeed, downloadSpeed } = req.body;
 
     try {
-        // Validate the input
         const { error, value } = packageSchema.validate({
             packageName,
             price,
@@ -67,9 +69,9 @@ const createPackage = async (req, res) => {
         });
 
         // Attempt to create the corresponding Mikrotik profile
-        
-
         try {
+            const connection = getRouterConnection();
+
             await connection.connect();
 
             await connection.write('/ppp/profile/add', [
@@ -122,34 +124,53 @@ const updatePackage = async (req, res) => {
         if (!oldPackage) {
             return res.status(404).json({ success: false, message: "Package not found" });
         }
-        const result = await Package.findByIdAndUpdate(id, 
-            {
-                packageName,
-                price,
-                type,
-                uploadSpeed,
-                downloadSpeed,
-            },
-            { new: true });
-        
-            // Update corresponding PPPoE profile in Mikrotik
-        // try {
-        //     const connection = await connectRouterOS();
-        //     await connection.write('/ppp/profile/set', [
-        //         '=.id=' + oldPackage.packageName,
-        //         '=name=' + packageName,
-        //         '=rate-limit=' + uploadSpeed + 'M/' + downloadSpeed + 'M'
-        //     ]);
-        // } catch (mikrotikError) {
-        //     console.error("Error updating Mikrotik profile:", mikrotikError);
-        //     res.status(500).json({ success: false, message: "Failed to update Mikrotik profile", error: mikrotikError.message });
-        // }finally {
-        //     connection.close();
-        // }
-        
-        res.status(200).json({ success: true, message: "Package updated", data: result });
-    } 
-    catch (error) {
+
+        try{
+            // update mikrotik profile first
+            const connection = getRouterConnection();
+            await connection.connect();
+
+            const profiles = await connection.write('/ppp/profile/print', [
+                '=.proplist=.id',
+                '?name=' + oldPackage.packageName
+            ]);
+
+            if(profiles.length > 0){
+                await connection.write('/ppp/profile/set', [
+                    '=.id=' + profiles[0]['.id'],
+                    '=name=' + packageName,
+                    '=rate-limit=' + uploadSpeed + '/' + downloadSpeed,
+                    '=local-address=' + process.env.MIKROTIK_LOCAL_ADDRESS,
+                    '=parent-queue=' + process.env.MIKROTIK_PARENT_QUEUE,
+                    '=remote-address=' + process.env.MIKROTIK_REMOTE_ADDRESS,
+                    '=use-encryption=yes',
+                    '=dns-server=' + process.env.MIKROTIK_DNS_SERVER,
+                ]);
+                connection.close();
+
+                // update mongodb
+               const result = await Package.findByIdAndUpdate(id, 
+                    {
+                        packageName,
+                        price,
+                        type,
+                        uploadSpeed,
+                        downloadSpeed,
+                    },
+                    { new: true });
+                
+                res.status(200).json({ success: true, message: "Package and Mikrotik profile updated successfully", data: result });
+            }
+
+        } catch (mikrotikError) {
+            console.error("Error updating Mikrotik profile:", mikrotikError);
+            res.status(500).json({ 
+                success: false, 
+                message: "Failed to update Mikrotik profile", 
+                error: mikrotikError.message 
+            });
+        }
+    } catch (error) {
         res.status(500).json({
             success: false,
             message: "Error updating package",
@@ -160,37 +181,58 @@ const updatePackage = async (req, res) => {
 
 const deletePackage = async (req, res) => {
     try {
-        const result = await Package.findByIdAndDelete(req.params.id);
-        if (!result) {
+        // First find the package to get its name for Mikrotik deletion
+        const package = await Package.findById(req.params.id);
+        if (!package) {
             return res.status(404).json({ success: false, message: "Package not found" });
         }
-        
-        // // Delete corresponding profile in Mikrotik
-        try{
-            
-            const connection = await connectRouterOS();
-            await connection.write('/ppp/profile/remove', [
-                '=.id=' + result.packageName
-            ]);
-            connection.close();
 
-        }catch(mikrotikError){
-            console.log("Error deleting Mikrotik Profile: ", mikrotikError);
-            res.status(500).json({ success: false, message: "Failed to delete Mikrotik Profile", error: mikrotikError.message });
-        }finally {
+        try {
+            // Try to delete from Mikrotik first
+            const connection =  getRouterConnection();
+
+            await connection.connect();
+            
+            // First find the profile ID
+            const profiles = await connection.write('/ppp/profile/print', [
+                '=.proplist=.id',
+                '?name=' + package.packageName
+            ]);
+
+            if (profiles.length > 0) {
+                // Delete the profile using its ID
+                await connection.write('/ppp/profile/remove', [
+                    '=.id=' + profiles[0]['.id']
+                ]);
+            }
+
             connection.close();
+            
+            // Only if Mikrotik deletion succeeds, delete from MongoDB
+            const result = await Package.findByIdAndDelete(req.params.id);
+            
+            res.status(200).json({ 
+                success: true, 
+                message: "Package and Mikrotik profile deleted successfully", 
+                data: result 
+            });
+
+        } catch (mikrotikError) {
+            console.error("Error deleting Mikrotik Profile: ", mikrotikError);
+            res.status(500).json({ 
+                success: false, 
+                message: "Failed to delete Mikrotik profile", 
+                error: mikrotikError.message 
+            });
         }
-        res.status(200).json({ success: true, message: "Package deleted", data: result });
-    }
-    catch (error) {
+    } catch (error) {
         res.status(500).json({
             success: false,
             message: "Error deleting package",
             error: error.message,
         });
     }
-}
-
+};
 module.exports = {
     getPackages,
     getPackageById,
