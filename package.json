@@ -9,14 +9,19 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "helmet": "^8.0.0",
     "joi": "^17.13.3",
+    "mikrotik": "^1.0.12",
     "moment-timezone": "^0.5.46",
     "mongoose": "^8.8.3",
     "node-cron": "^3.0.3",
+    "node-routeros": "^1.6.8",
+    "node-ssh": "^13.2.0",
+    "routeros-client": "^1.1.1",
     "validator": "^13.12.0"
   }
 }

@@ -6,31 +6,32 @@ const packageSchema = new mongoose.Schema({
         type: String,
         require: [true, "packageName is required"],
         trim: true,
-        lowercase: true,
+        unique: true,
     },
     price: {
         type: Number,
         require: [true, "price is required"],
         trim: true,
-        lowercase: true,
     },
     type: {
         type: String,
         require: [true, "type is required"],
-        enum: ["PPPoE", 'Hotspot'],
-        default: 'PPPoE',
+        enum: ["pppoe", 'hotspot'],
+        default: 'pppoe',
         trim: true,
-        
     },
     uploadSpeed: {
         type: String,
         trim: true,
         require: [true, "uploadSpeed is required"],
+        uppercase: true,
     },
     downloadSpeed: {
         type: String,
         trim: true,
         require: [true, "downloadSpeed is required"],
+        uppercase: true,
+
     },
 },
 {

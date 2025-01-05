@@ -1,21 +1,19 @@
 const Joi = require('joi');
 
 const userSchema = Joi.object({
-    type: Joi.string().valid("PPPoE", "Hotspot").required(),
+    type: Joi.string().valid("pppoe", "hotspot").required(),
     firstName: Joi.string().min(2).required(),
-    lastName: Joi.string().min(2).required(),
-    username: Joi.string().alphanum().min(3).required(),
+    lastName: Joi.string().min(2).optional().allow(""),
+    username: Joi.string().min(3).required(),
     userPaass: Joi.string().min(6).required(),
-    confirmUserPaass: Joi.string()
-        .valid(Joi.ref("userPaass"))
-        .required()
-        .messages({ "any.only": "Password must match" }),
     packageId: Joi.string().required(),
-    email: Joi.string().email().required(),
+    email: Joi.string()
+        .optional() 
+        .allow(""),
     connectionExpiryDate: Joi.date().iso().optional(),
     phoneNumber: Joi.string().min(10).required(),
-    address: Joi.string().optional(),
-    comment: Joi.string().optional(),
+    comment: Joi.string().optional().allow(""),
+    address: Joi.string().optional().allow(""),
     balance: Joi.number().optional(),
     totalAmountPaid: Joi.number().optional(),
 })
@@ -23,17 +21,27 @@ const userSchema = Joi.object({
 const packageSchema = Joi.object({
     packageName: Joi.string().required(),
     price: Joi.number().required(),
-    type: Joi.string().valid("PPPoE", "Hotspot").required(),
-    uploadSpeed: Joi.string().required(),
-    downloadSpeed: Joi.string().required(),
+    type: Joi.string().valid("pppoe", "hotspot").required(),
+    uploadSpeed: Joi.string()
+        .pattern(/^\d+M$/) 
+        .required()
+        .messages({
+            "string.pattern.base": "Enter a valid Upload speed e.g., 10M.",
+        }),
+    downloadSpeed: Joi.string()
+        .pattern(/^\d+M$/)
+        .required()
+        .messages({
+            "string.pattern.base": "Enter a valid Download speed e.g., 10M.",
+        }),
 })
 
 const paymentSchema = Joi.object({
     amount: Joi.number().required(),
     paymentMethod: Joi.string().valid("cash", "bank", "mpesa").required(),
-    paymentDate: Joi.date().iso().optional(),
+    paymentDate: Joi.date().iso().required(),
     userId: Joi.string().required(),
-    comment: Joi.string().optional(),
+    comment: Joi.string().optional().allow(""),
     receiptNumber: Joi.string().required(),
     checked: Joi.string().valid("yes", "no").required(),
     

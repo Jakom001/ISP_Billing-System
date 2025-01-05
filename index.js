@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require("express");
 const userRoutes = require("./routes/usersRoutes");
 const packageRoutes = require("./routes/packageRoutes");
@@ -38,4 +39,4 @@ app.listen(4000, () =>{
 })
 
 // initialize cron jobs
-cronJobs.initializeCronjobs() 
+// cronJobs.initializeCronjobs() 

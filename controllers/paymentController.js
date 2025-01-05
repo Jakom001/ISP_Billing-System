@@ -70,9 +70,9 @@ const createPayment = async (req, res) => {
     if (payingUser.balance >= payingUser.package.price && (!payingUser.connectionExpiryDate || payingUser.connectionExpiryDate < new Date())) {
         payingUser.balance -= payingUser.package.price;
 
-        const now = new Date();
-        now.setHours(23, 59, 59, 999);
-        payingUser.connectionExpiryDate = new Date(now.setDate(now.getDate() + 30));
+        const datePaid = new Date(paymentDate);
+        datePaid.setHours(23, 59, 59, 999);
+        payingUser.connectionExpiryDate = new Date(datePaid.setDate(datePaid.getDate() + 30));
         payingUser.isConnected = true;
     }
     
@@ -135,12 +135,11 @@ const updatePayment = async (req, res) => {
                 return res.status(404).json({ success: false, message: "Payment not found" });
             }
 
-            const connectionExpiry = new Date(paymentDate);
-            connectionExpiry.setDate(connectionExpiry.getDate() + 30);
-            user.isConnected = true;
-            user.balance += amount;
-            user.connectionExpiryDate = connectionExpiry;
-            await user.save();
+            // const connectionExpiry = new Date(paymentDate);
+            // // user.balance += amount;
+            // connectionExpiry.setHours(23, 59, 59, 999);
+            // user.connectionExpiryDate = new Date(connectionExpiry.setDate(connectionExpiry.getDate() + 30));
+            // await user.save();
         
     res.status(200).json({ success: true, message: "Payment updated", data: result });
     } catch (error) {
@@ -170,7 +169,10 @@ const deletePayment = async (req, res) => {
 
 const getPackageById = async (req, res) => {
     try {
-        const result = await Payment.findById(req.params.id);
+        const result = await Payment.findById(req.params.id).populate({
+            path: "user",
+            select: "username",
+        });
         if (!result) {
             return res.status(404).json({ success: false, message: "Payment not found" });
         }

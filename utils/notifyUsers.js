@@ -6,14 +6,17 @@ const packagePrices = require("../utils/packages");
 const notifyUsers = async () => {
     try {
       const now = new Date();
-      const users = await User.find({ connectionExpiry: { $gte: now } });
+      const users = await User.find({ connectionExpiry: { $gte: now } }).populate({
+        path: "package",
+        select: "packageName price"
+      });
   
       for (const user of users) {
-        const daysRemaining = Math.ceil((user.connectionExpiry - now) / (1000 * 60 * 60 * 24));
-        const packagePrice = packagePrices[user.package];
+        const daysRemaining = Math.ceil((user.connectionExpiryDate - now) / (1000 * 60 * 60 * 24));
+        const packagePrice = users.package.price;
   
         if (user.balance < packagePrice) {
-          let message = `Reminder: Your balance of ${user.balance} is insufficient for the ${user.package} package (price: ${packagePrice}).`;
+          let message = `Reminder: Your balance of ${user.balance} is insufficient for the ${user.package.packageName} package (price: ${packagePrice}).`;
   
           if (daysRemaining === 5 || daysRemaining === 3 || daysRemaining === 1 || daysRemaining === 0) {
             message += ` You have ${daysRemaining} day(s) left before your connection expires. Please top up to avoid disconnection.`;
@@ -36,7 +39,7 @@ const notifyUsers = async () => {
         // Expiry Logic at 11:59 PM
         if (daysRemaining === 0 && now.getHours() === 23 && now.getMinutes() === 59) {
           user.isConnected = false; // Disconnect the user
-          user.connectionExpiry = null;
+          user.connectionExpiryDate = null;
           await user.save();
           console.log(`User ${user.username} has been disconnected due to insufficient balance.`);
         }
@@ -51,3 +54,4 @@ const notifyUsers = async () => {
     console.log("Running user notifications...");
     await notifyUsers();
   });
+  

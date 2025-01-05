@@ -1,17 +1,15 @@
 const { timeStamp } = require("console");
 const mongoose = require("mongoose");
-const {isEmail} = require("validator")
 
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
         require: [true, "firstName is required"],
         trim: true,
-        lowercase: true,
+        titlecase: true,
     },
     lastName: {
         type: String,
-        require: [true, "lastName is required"],
         trim: true,
         lowercase: true,
     },
@@ -20,26 +18,20 @@ const userSchema = new mongoose.Schema({
         require: [true, "userName is required"],
         trim: true,
         unique: true,
-        lowercase: true,
     },
     type: {
         type: String,
         require: [true, "type is required"],
-        enum: ["PPPoE", 'Hotspot'],
-        default: 'PPPoE',
+        enum: ["pppoe", 'hotspot'],
         trim: true,
     },
-    firstName: {
-        type: String,
-        require: [true, "firstName is required"],
-        trim: true,
-        lowercase: true,
-    },
+    
     userPassw: {
         type: String,
         require: [true, "UserPassword is required"],
         trim: true,
-        select:false,
+        select:true,
+        plaintext: true,
         minlength: [6, "UserPassowrd must be atleast 8 characters"]
     },
     
@@ -48,14 +40,13 @@ const userSchema = new mongoose.Schema({
         ref: "Package",
         require: [true, "package is required"],
     },
-    
     email: {
         type: String,
-        require: [true, "email is required"],
+        require: false,
         trim: true,
         lowercase: true,
-        unique: true,
-        validate: [isEmail, "Please enter a valid email"]
+        sparse: true,
+        
     },
     phoneNumber: {
         type: String,
@@ -66,15 +57,10 @@ const userSchema = new mongoose.Schema({
     },
     address: {
         type: String,
-        require: [true, "firstName is required"],
-        trim: true,
-        lowercase: true,
+        
     },
     comment: {
         type: String,
-        require: [true, "comments is required"],
-        trim: true,
-        lowercase: true,
     },
     isConnected:{
         type: Boolean,
