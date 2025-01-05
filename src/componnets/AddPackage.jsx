@@ -14,8 +14,8 @@ const AddPackage = () => {
 })
 
   const connectionTypes = [
-    {value: 'PPPoE', label: "PPPoE"},
-    {value: 'Hotspot', label: "Hotspot"},
+    {value: 'pppoe', label: "PPPoE"},
+    {value: 'hotspot', label: "Hotspot"},
   ]
 
   const [errors, setErrors] = useState({});

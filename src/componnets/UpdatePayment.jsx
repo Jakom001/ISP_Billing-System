@@ -4,7 +4,7 @@ import { updatePayment, getPaymentById } from "../api/paymentApi";
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useUserContext } from "../context/UserContext";
-
+import moment from 'moment';
 const UpdatePayment = () => {
   const { fetchPayments } = usePaymentContext();
   const { id } = useParams();
@@ -33,6 +33,12 @@ const UpdatePayment = () => {
     {value: 'no', label: "No"},
   ]
 
+  const { users, fetchUsers } = useUserContext();
+    
+  useEffect(() => {
+     fetchUsers();
+   }, [fetchUsers]);
+
   useEffect(() => {
     const fetchPaymentDetails = async () => {
       try {
@@ -58,11 +64,7 @@ const UpdatePayment = () => {
     fetchPaymentDetails();
   }, [id]);
 
-  const { users, fetchUsers } = useUserContext();
-    
-    useEffect(() => {
-       fetchUsers();
-     }, [fetchUsers]);
+  
 
      const validateForm = () =>{
       const newErrors = {};
@@ -91,9 +93,7 @@ const UpdatePayment = () => {
       }else if(!["yes", "no",].includes(formData.checked)){
           newErrors.checked = "Invalid checked status"
       }
-      if (!formData.comment.trim()){
-          newErrors.comment = "Comment is required"
-      }
+      
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
   }
@@ -174,6 +174,7 @@ const UpdatePayment = () => {
               </label>
               <select
                 name="userId"
+                disabled
                 value={formData.userId}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -191,7 +192,7 @@ const UpdatePayment = () => {
             </div>
                 <div>
                     <label htmlFor="amount" className="block text-sm font-medium text-gray-700">Amount</label>
-                    <input type="number" name="amount" id="amount" value={formData.amount} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md" />
+                    <input type="number" disabled name="amount" id="amount" value={formData.amount} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md" />
                     {errors.amount && <p className="text-red-500">{errors.amount}</p>}
                 </div>
                 <div>
@@ -211,7 +212,7 @@ const UpdatePayment = () => {
                 </div>
                 <div>
                     <label htmlFor="paymentDate" className="block text-sm font-medium text-gray-700">Payment Date</label>
-                    <input type="datetime-local"  min={new Date().toISOString().slice(0, 16)} name="paymentDate" id="paymentDate" value={formData.paymentDate} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md" />
+                    <input type="datetime-local"  name="paymentDate" id="paymentDate" value={formData.paymentDate} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md" />
                     {errors.paymentDate && <p className="text-red-500">{errors.paymentDate}</p>}
                 </div>
                

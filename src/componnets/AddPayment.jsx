@@ -63,9 +63,7 @@ const AddPayment = () => {
     }else if(!["yes", "no",].includes(formData.checked)){
         newErrors.checked = "Invalid checked status"
     }
-    if (!formData.comment.trim()){
-        newErrors.comment = "Comment is required"
-    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
 }

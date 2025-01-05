@@ -19,7 +19,6 @@ const AddUser = () => {
     lastName: "",
     username:"",
     userPaass:"",
-    confirmUserPaass:"",
     packageId:"",
     email: "",
     phoneNumber:"",
@@ -51,8 +50,8 @@ if (preset === 'custom') {
 };
 
   const connectionTypes = [
-    {value: 'PPPoE', label: "PPPoE"},
-    {value: 'Hotspot', label: "Hotspot"},
+    {value: 'pppoe', label: "PPPoE"},
+    {value: 'hotspot', label: "Hotspot"},
 ]
 
   const validateForm = () =>{
@@ -65,10 +64,6 @@ if (preset === 'custom') {
     if (!formData.firstName.trim()) {
         newErrors.firstName = 'First name is required';
       }
-      
-    if (!formData.lastName.trim()) {
-        newErrors.lastName = 'Last name is required';
-    }
 
     if (!formData.username.trim()) {
         newErrors.username = 'Username is required';
@@ -82,18 +77,6 @@ if (preset === 'custom') {
         newErrors.userPaass = 'UserPaass must be at least 6 characters';
     }
 
-    if (!formData.confirmUserPaass) {
-        newErrors.confirmUserPaass = 'Please confirm your userPaass';
-    } else if (formData.userPaass !== formData.confirmUserPaass) {
-        newErrors.confirmUserPaass = 'UserPaasss do not match';
-    }
-
-    if (!formData.email) {
-        newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.email = 'Please enter a valid email';
-    }
-
     if (!formData.packageId) {
         newErrors.packageId = 'Please select a package';
     }
@@ -104,12 +87,7 @@ if (preset === 'custom') {
     } else if (!/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ''))) {
         newErrors.phoneNumber = 'Please enter a valid 10-digit phone number';
     }
-    if (!formData.address.trim()) {
-    newErrors.address = 'Address is required';
-    }
-    if (!formData.address.trim()) {
-        newErrors.address = 'Address is required';
-    }
+    
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -170,6 +148,7 @@ if (preset === 'custom') {
       console.log("Form has errors", errors);
      }
   }
+
 
   return (
     <div className='min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8'>
@@ -259,42 +238,9 @@ if (preset === 'custom') {
                 )}
               </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                  )}
-                </div>
-              </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                {errors.phoneNumber && (
-                  <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
-                )}
-              </div>
-
-          <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                UserPaass
+                Password
               </label>
               <div className="relative">
                 <input
@@ -320,36 +266,51 @@ if (preset === 'custom') {
                 <p className="mt-1 text-sm text-red-600">{errors.userPaass}</p>
               )}
             </div>
+              
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm UserPaass
-            </label>
-            <div className="relative">
-              <input
-                type={showConfirmUserPaass ? "text" : "userPaass"}
-                name="confirmUserPaass"
-                value={formData.confirmUserPaass}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmUserPaass(!showConfirmUserPaass)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
-              >
-                {showConfirmUserPaass ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
+                
+              </div>
+
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {errors.phoneNumber && (
+                  <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
                 )}
-              </button>
-            </div>
-            {errors.confirmUserPaass && (
-              <p className="mt-1 text-sm text-red-600">{errors.confirmUserPaass}</p>
-            )}
-          </div>
+              </div>
+              
+              
+            <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="text"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                  )}
+                </div>
 
+                
+              </div>
+          
+
+          
           <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Package
@@ -371,6 +332,8 @@ if (preset === 'custom') {
                 <p className="mt-1 text-sm text-red-600">{errors.packageId}</p>
               )}
             </div>
+
+            
 
           
 
