@@ -1,12 +1,13 @@
-const RouterOSAPI = require('node-routeros').RouterOSAPI;
 require('dotenv').config()
+// const RouterOSAPI = require('node-routeros').RouterOSAPI;
+// require('dotenv').config()
 
-        const host = process.env.MIKROTIK_HOST
-        const user = process.env.MIKROTIK_USER
-        const pass = process.env.MIKROTIK_PASSWORD
-        const port = process.env.MIKROTIK_PORT
+//         const host = process.env.MIKROTIK_HOST
+//         const user = process.env.MIKROTIK_USER
+//         const pass = process.env.MIKROTIK_PASSWORD
+//         const port = process.env.MIKROTIK_PORT
 
-        console.log(host, user, pass, port)
+//         console.log(host, user, pass, port)
 
 // async function getPPPoEUsers(){
 //     const conn = new RouterOSAPI({
@@ -57,3 +58,8 @@ require('dotenv').config()
 // }
 
 // getPPPoEUsers();
+// console.log('Time zone:', process.env.TZ);
+
+// Set default timezone globally in your app
+console.log(process.env.TZ);
+console.log('Current time:', new Date().toString());

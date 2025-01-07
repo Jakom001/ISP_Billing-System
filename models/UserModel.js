@@ -25,13 +25,10 @@ const userSchema = new mongoose.Schema({
         enum: ["pppoe", 'hotspot'],
         trim: true,
     },
-    
     userPassw: {
         type: String,
         require: [true, "UserPassword is required"],
-        trim: true,
         select:true,
-        plaintext: true,
         minlength: [6, "UserPassowrd must be atleast 8 characters"]
     },
     

@@ -39,4 +39,4 @@ app.listen(4000, () =>{
 })
 
 // initialize cron jobs
-// cronJobs.initializeCronjobs() 
+cronJobs.initializeCronjobs() 

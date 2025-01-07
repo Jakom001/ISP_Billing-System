@@ -6,12 +6,13 @@ const RouterOSAPI = require('node-routeros').RouterOSAPI;
 
 function getRouterConnection(){
     return  new RouterOSAPI({
-        host: process.env.MIKROTIK_HOSsT,
+        host: process.env.MIKROTIK_HOST,
         user: process.env.MIKROTIK_USER,
         password: process.env.MIKROTIK_PASSWORD,
         port: process.env.MIKROTIK_PORT,
     });
 }
+
 
 const { paymentSchema } = require("../middlewares/validator")
 
@@ -77,16 +78,12 @@ const createPayment = async (req, res) => {
             checked,
         });
 
-        const result = await payment.save();
-        res.status(201).json({message: "User payment add successfully", data: result});
-        
+        const result = await payment.save();        
        
         payingUser.balance += Number(amount);
         payingUser.totalAmountPaid += Number(amount);
 
         const now = new Date();
-        now.setHours(23, 59, 59, 999);
-
         if (
             payingUser.balance >= payingUser.package.price &&
             (!payingUser.connectionExpiryDate || payingUser.connectionExpiryDate < now)
@@ -129,13 +126,19 @@ const createPayment = async (req, res) => {
                 }
 
                 connection.close();
-                res.status(201).json({message: "User Enabled successfully in Mikrotik",});
-
 
             } catch (mikrotikError) {
                 console.error("Error interacting with MikroTik:", mikrotikError);
                 return res.status(500).json({ success: false, message: "Error enabling user connection on MikroTik" });
             }
+        }
+        if (
+            payingUser.balance >= payingUser.package.price &&
+            (payingUser.connectionExpiryDate > now)
+        ){
+            payingUser.balance -= payingUser.package.price;
+            const dateToExpire = new Date(payingUser.connectionExpiryDate)
+            payingUser.connectionExpiryDate = new Date(dateToExpire.setDate(dateToExpire.getDate() + 30))  
         }
 
         await payingUser.save();
@@ -149,7 +152,6 @@ const createPayment = async (req, res) => {
     }
 };
 
- 
 
 const updatePayment = async (req, res) => {
     const {

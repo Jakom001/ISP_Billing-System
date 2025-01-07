@@ -2,8 +2,6 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const twilio = require("twilio");
 
-
-
 const sendEmailNotification = async (email, message) => {
     try{
         const transporter = nodemailer.createTransport({
@@ -30,21 +28,21 @@ const sendEmailNotification = async (email, message) => {
 
 
 
-const sendSMSNotification = async (user, message) => {
-  const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+// const sendSMSNotification = async (user, message) => {
+//   const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 
-  try {
-    await client.messages.create({
-      body: message,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: user.phoneNumber,
-    });
-    console.log(`SMS sent to ${user.phoneNumber}`);
-  } catch (error) {
-    console.error("Failed to send SMS:", error.message);
-  }
-};
+//   try {
+//     await client.messages.create({
+//       body: message,
+//       from: process.env.TWILIO_PHONE_NUMBER,
+//       to: user.phoneNumber,
+//     });
+//     console.log(`SMS sent to ${user.phoneNumber}`);
+//   } catch (error) {
+//     console.error("Failed to send SMS:", error.message);
+//   }
+// };
 
-module.exports = { sendSMSNotification };
+// module.exports = { sendSMSNotification };
 
 module.exports = {sendEmailNotification};

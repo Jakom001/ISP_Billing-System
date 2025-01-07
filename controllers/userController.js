@@ -1,3 +1,4 @@
+require('dotenv').config()
 const User = require("../models/userModel");
 const Package = require("../models/packageModel");
 const RouterOSAPI = require('node-routeros').RouterOSAPI;
