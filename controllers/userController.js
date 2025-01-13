@@ -15,7 +15,7 @@ function getRouterConnection(){
 
 const getUsers = async (req, res) =>{
     try{
-        const result = await User.find().populate({
+        const result = await User.find().sort({createdAt: -1}).populate({
             path: "package",
             select: "packageName"
         })

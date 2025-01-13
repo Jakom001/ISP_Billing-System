@@ -18,7 +18,7 @@ const { paymentSchema } = require("../middlewares/validator")
 
 const getPayments = async (req, res) => {
     try {
-        const result = await Payment.find().populate({
+        const result = await Payment.find().sort({createdAt: -1}).populate({
             path: "user",
             select: "username phoneNumber",
         });

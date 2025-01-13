@@ -1,14 +1,16 @@
-require('dotenv').config()
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require("express");
 const userRoutes = require("./routes/usersRoutes");
 const packageRoutes = require("./routes/packageRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const authRoutes = require("./routes/authRoutes");
 const connectDB = require("./config/db");
 const cronJobs = require("./utils/cronjobs");
 const cors = require('cors');
 const helmet = require('helmet');
-
-require("dotenv").config();
+const cookieParser = require('cookie-parser');
+const isAuthenticated = require('./middlewares/authenticateUser');
 
 const app = express()
 
@@ -17,6 +19,7 @@ app.use(express.json())
 app.use(cors())
 app.use(helmet())
 app.use(express.urlencoded({extended: true}));
+app.use(cookieParser())
 
 // Connect Database
 connectDB();
@@ -25,9 +28,10 @@ connectDB();
 app.get("/", (req, res) =>{
     res.send("The server is running...")
 })
-app.use("/api/users", userRoutes)
+app.use("/api/users", isAuthenticated, userRoutes)
 app.use("/api/packages", packageRoutes)
 app.use("/api/payments", paymentRoutes)
+app.use('/api/auths', authRoutes)
 
 // Error Handling: 404 Handler
 app.use((req, res) =>{
