@@ -136,13 +136,11 @@ const addUser = async(req,res) =>{
 }
 
 const deleteUser = async (req, res) =>{
-
     try{
         const user = await User.findById(req.params.id)
         if(!user){
             return res.status(404).json({success:false, message: "User not found"})
         }
-
         try{
             const conn = getRouterConnection();
             await conn.connect();

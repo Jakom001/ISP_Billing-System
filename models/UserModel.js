@@ -51,7 +51,6 @@ const userSchema = new mongoose.Schema({
         trim: true,
         lowercase: true,
         unique: true,
-        match: /^\+\d{1,3}\s\(\d{3}\)\s\d{3}-\d{4}$/
     },
     address: {
         type: String,

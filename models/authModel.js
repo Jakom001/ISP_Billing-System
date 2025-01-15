@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { isLowercase } = require('validator');
 
 const authSchema = new mongoose.Schema({
     firstName: { 
@@ -28,7 +27,7 @@ const authSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: [true, "Phone Number is required"],
-        match: /^\+\d{1,3}\s\(\d{3}\)\s\d{3}-\d{4}$/
+        trim:true,
     },
     verified:{
         type: Boolean,

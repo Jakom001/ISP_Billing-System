@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const register = async (req, res) => {
-    const {firstName, lastName, phone, email, password} = req.body
+    const {firstName, lastName, phone, email, password, confirmPassword} = req.body
 
     try{
         const {error, value} = registerSchema.validate({
@@ -73,7 +73,7 @@ const login = async (req, res) => {
 
         // jwt
         const token = jwt.sign(
-            { userId: result._id, email: result.email},
+            { userId: user._id, email: user.email},
                 process.env.JWT_SECRET,
             {
                 expiresIn: process.env.JWT_EXPIRATION

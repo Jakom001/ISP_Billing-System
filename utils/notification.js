@@ -2,7 +2,7 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const twilio = require("twilio");
 
-const sendEmailNotification = async (email, message) => {
+const sendEmailNotification = async (email, subject, message) => {
     try{
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -15,7 +15,7 @@ const sendEmailNotification = async (email, message) => {
         const mailOptions = {
             from: process.env.EMAIL,
             to: user.email,
-            subject: "Subscription Expiry Reminder",
+            subject: subject,
             text: message,
         };
 
