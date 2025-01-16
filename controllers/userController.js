@@ -2,7 +2,7 @@ require('dotenv').config()
 const User = require("../models/userModel");
 const Package = require("../models/packageModel");
 const RouterOSAPI = require('node-routeros').RouterOSAPI;
-const { userSchema } = require("../middlewares/validator");
+const { userSchema, checkConnectionExpiryDate } = require("../middlewares/validator");
 
 function getRouterConnection(){
     return  new RouterOSAPI({
@@ -135,50 +135,6 @@ const addUser = async(req,res) =>{
     }
 }
 
-const deleteUser = async (req, res) =>{
-    try{
-        const user = await User.findById(req.params.id)
-        if(!user){
-            return res.status(404).json({success:false, message: "User not found"})
-        }
-        try{
-            const conn = getRouterConnection();
-            await conn.connect();
-            
-            // First find the item to get its ID
-            const items = await conn.write('/ppp/secret/print', [
-                '=.proplist=.id',
-                '?name=' + user.username
-            ]);
-
-            if (items.length > 0) {
-                // Delete using the internal ID
-                await conn.write('/ppp/secret/remove', [
-                    '=.id=' + items[0]['.id']
-                ]);
-            }
-            conn.close();
-
-            const result = await User.findByIdAndDelete(req.params.id);
-            
-            res.status(200).json({success:true, message: "User deleted successfully", data:result})
-
-        } catch (mikrotikError) {
-            console.error("Error deleting username in mikrotik: ", mikrotikError);
-            res.status(500).json({ 
-                success: false, 
-                message: "Failed to delete Mikrotik profile", 
-                error: mikrotikError.message 
-            });
-        }
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error user",
-            error: error.message,
-        });
-    }
-};
 
 const updateUser = async (req, res) => {
     const {
@@ -304,10 +260,223 @@ const updateUser = async (req, res) => {
         });
     }
 };
+
+const deleteUser = async (req, res) =>{
+    try{
+        const user = await User.findById(req.params.id)
+        if(!user){
+            return res.status(404).json({success:false, message: "User not found"})
+        }
+        try{
+            const conn = getRouterConnection();
+            await conn.connect();
+            
+            // First find the item to get its ID
+            const items = await conn.write('/ppp/secret/print', [
+                '=.proplist=.id',
+                '?name=' + user.username
+            ]);
+
+            if (items.length > 0) {
+                // Delete using the internal ID
+                await conn.write('/ppp/secret/remove', [
+                    '=.id=' + items[0]['.id']
+                ]);
+            }
+            conn.close();
+
+            const result = await User.findByIdAndDelete(req.params.id);
+            
+            res.status(200).json({success:true, message: "User deleted successfully", data:result})
+
+        } catch (mikrotikError) {
+            console.error("Error deleting username in mikrotik: ", mikrotikError);
+            res.status(500).json({ 
+                success: false, 
+                message: "Failed to delete Mikrotik profile", 
+                error: mikrotikError.message 
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error user",
+            error: error.message,
+        });
+    }
+};
+
+const changeExpiryDate = async (res, req) =>{
+    const { connectionExpiryDate, id} = req.body;
+
+    try{
+        const {error, value} = checkConnectionExpiryDate.validate({connectionExpiryDate});
+        if(error){
+            return res.status(400).json({
+                message: "Validation failed",
+                success: false,
+                errors: error.details.map((err) => err.message),
+            });
+        }
+        const user = await User.findByIdAndUpdate(req.params.id, { connectionExpiryDate }, {new: true});
+        if(!user){
+            return res.status(404).json({success:false, message: "User not found"})
+        }
+        res.status(200).json({success:true, message: "User updated successfully", data: user})
+    }catch(error){
+        res.status(500).json({
+            success: false,
+            message: "Error updating user",
+            error: error.message,
+        });
+    }
+}
+    const activeUsers = () => {
+        // return User.find({connectionExpiryDate: {$gte: new Date()}}).populate('package');
+
+        try{
+            const conn = getRouterConnection()
+            await conn.connect();
+
+            // Find all active users
+            const users = await conn.write('/ppp/active/print');
+            
+            if(users.length === 0){
+                return res.status(200).json({success: true, message: "No active users found"})
+            }
+            res.status(200).json({success: true, message: "Active users found", data: users})
+    
+        }catch(e){
+            console.error("Error getting active users: ", e);
+            res.status(500).json({ 
+                success: false, 
+                message: "Failed to connect to Mikrotik", 
+                error: e.message 
+            });
+        }
+    }
+
+    const expiredUsers = () => {
+        return User.find({connectionExpiryDate: {$lt: new Date()}}).populate('package');
+    }
+
+    const enabledUsers = () => {
+        return User.find({enabled: true}).populate('package');
+    }
+
+    const activateUser = async (req, res) => {
+        try{
+            const user = await User.findById(req.params.id);
+
+            if(!user){
+                return res.status(404).json({success:false, message: "User not found"})
+            }
+            try{
+                const conn = getRouterConnection();
+                await conn.connect();
+                
+                // First find the item to get its ID
+                const items = await conn.write('/ppp/secret/print', [
+                    '=.proplist=.id',
+                    '?name=' + user.username
+                ]);
+                
+                if (items.length > 0) {
+                    // Activate using the internal ID
+                    await conn.write('/ppp/active/set', [
+                        '=.id=' + items[0]['.id'],
+                        '=status=active'
+                    ]);
+                    conn.close();
+                    user.connectionExpiryDate = new Date();
+                    await user.save();
+                    res.status(200).json({success: true, message: "User activated successfully", data: user})
+                    return;
+                    
+                } else {
+                    conn.close();
+                    return res.status(404).json({success: false, message: "PPPoE secret not found in Mikrotik"})
+                }
+
+    
+            }catch(e) {
+                console.error("Error getting username in mikrotik: ", e);
+                res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to connect to Mikrotik", 
+                    error: e.message 
+                });
+    
+        }
+    }catch (error){
+            res.status(500).json({
+                success: false,
+                message: "Error getting user",
+                error: error.message,
+            });
+        }
+        }
+
+    const deactivateUser = async (req, res) => {
+        try{
+            const user = await User.findById(req.params.id);
+            if(!user){
+                return res.status(404).json({success:false, message: "User not found"})
+            }
+
+            try{
+                const conn = getRouterConnection();
+                await conn.connect();
+                
+                // First find the item to get its ID
+                const items = await conn.write('/ppp/secret/print', [
+                    '=.proplist=.id',
+                    '?name=' + user.username
+                ]);
+                
+                if (items.length > 0) {
+                    // Deactivate using the internal ID
+                    await conn.write('/ppp/active/set', [
+                        '=.id=' + items[0]['.id'],
+                        '=status=inactive'
+                    ]);
+                    conn.close();
+                    user.enabled = false;
+                    await user.save();
+                    res.status(200).json({success: true, message: "User deactivated successfully", data: user})
+                    return;
+                } else {
+                    conn.close();
+                    return res.status(404).json({success: false, message: "PPPoE secret not found in Mikrotik"})
+                }
+                
+            }catch(e) {
+                console.error("Error getting username in mikrotik: ", e);
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to connect to Mikrotik",
+                    error: e.message,
+                });
+            }
+
+        }catch(e){
+            console.error("Error getting user: ", e);
+            res.status(500).json({
+                success: false,
+                message: "Error getting user",
+                error: e.message,
+            });
+        }
+    }
+
 module.exports = {
     getUsers,
     addUser,
     deleteUser,
     updateUser,
-    getUserById
+    getUserById,
+    changeExpiryDate,
+    activeUsers,
+    expiredUsers,
+    activateUser,
 }

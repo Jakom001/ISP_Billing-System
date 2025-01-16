@@ -60,11 +60,15 @@ const loginSchema = Joi.object({
     password: Joi.string().min(8).required(),
 })
 
+const checkConnectionExpiryDate = Joi.object({
+    connectionExpiryDate: Joi.date().iso().required(),
+})
 module.exports = {
     userSchema,
     packageSchema,
     paymentSchema,
     registerSchema,
     loginSchema,
+    checkConnectionExpiryDate,
 };
 

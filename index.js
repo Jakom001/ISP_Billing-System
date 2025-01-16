@@ -28,9 +28,9 @@ connectDB();
 app.get("/", (req, res) =>{
     res.send("The server is running...")
 })
-app.use("/api/users", userRoutes)
-app.use("/api/packages", packageRoutes)
-app.use("/api/payments", paymentRoutes)
+app.use("/api/users", isAuthenticated, userRoutes)
+app.use("/api/packages", isAuthenticated, packageRoutes)
+app.use("/api/payments", isAuthenticated, paymentRoutes)
 app.use('/api/auths', authRoutes)
 
 // Error Handling: 404 Handler
