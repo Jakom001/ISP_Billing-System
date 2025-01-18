@@ -131,7 +131,7 @@ const handleChange = (e) =>{
           <form onSubmit={handleSubmit} className='space-y-6'>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                User
+                User <span className='text-red-500 font-bold'>*</span>
               </label>
               <select
                 name="userId"
@@ -139,7 +139,7 @@ const handleChange = (e) =>{
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">Select User</option>
+                <option value="">Select User </option>
                 {users.map((usr) => (
                   <option key={usr._id} value={usr._id}>
                     {usr.username}
@@ -151,17 +151,17 @@ const handleChange = (e) =>{
               )}
             </div>
                 <div>
-                    <label htmlFor="amount" className="block text-sm font-medium text-gray-700">Amount</label>
+                    <label htmlFor="amount" className="block text-sm font-medium text-gray-700">Amount <span className='text-red-500 font-bold'>*</span></label>
                     <input type="number" name="amount" id="amount" value={formData.amount} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md" />
                     {errors.amount && <p className="text-red-500">{errors.amount}</p>}
                 </div>
                 <div>
-                    <label htmlFor="receiptNumber" className="block text-sm font-medium text-gray-700">Receipt Number</label>
+                    <label htmlFor="receiptNumber" className="block text-sm font-medium text-gray-700">Receipt Number <span className='text-red-500 font-bold'>*</span></label>
                     <input type="text" name="receiptNumber" id="receiptNumber" value={formData.receiptNumber} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md" />
                     {errors.receiptNumber && <p className="text-red-500">{errors.receiptNumber}</p>}
                 </div>
                 <div>
-                    <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700">Payment Method</label>
+                    <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700">Payment Method <span className='text-red-500 font-bold'>*</span></label>
                     <select name="paymentMethod" id="paymentMethod" value={formData.paymentMethod} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md">
                         <option value="">Select Payment Method</option>
                         {paymentMethods.map(method => (
@@ -171,13 +171,13 @@ const handleChange = (e) =>{
                     {errors.paymentMethod && <p className="text-red-500">{errors.paymentMethod}</p>}
                 </div>
                 <div>
-                    <label htmlFor="paymentDate" className="block text-sm font-medium text-gray-700">Payment Date</label>
+                    <label htmlFor="paymentDate" className="block text-sm font-medium text-gray-700">Payment Date <span className='text-red-500 font-bold'>*</span></label>
                     <input type="datetime-local"  name="paymentDate" id="paymentDate" value={formData.paymentDate} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md" />
                     {errors.paymentDate && <p className="text-red-500">{errors.paymentDate}</p>}
                 </div>
                
                 <div>
-                    <label htmlFor="checked" className="block text-sm font-medium text-gray-700">Checked</label>
+                    <label htmlFor="checked" className="block text-sm font-medium text-gray-700">Checked <span className='text-red-500 font-bold'>*</span></label>
                     <select name="checked" id="checked" value={formData.checked} onChange={handleChange} className="mt-1 p-2 border border-gray-300 block w-full rounded-md">
                         <option value="">Select Checked Status</option>
                         {checkedStatuses.map(status => (

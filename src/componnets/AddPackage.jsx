@@ -106,7 +106,7 @@ const AddPackage = () => {
       <div className="max-w-3xl mx-auto">
         <div className="bg-white text-blackColor shadow-md rounded-lg px-8 py-6">
           <h2 className='text-2xl font-bold text-gray-900 mb-6'>
-            Create Packages
+            Create Packages 
           </h2>
           {submitted && (
             <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md">
@@ -122,7 +122,7 @@ const AddPackage = () => {
           <form onSubmit={handleSubmit} className='space-y-6'>
           <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name of Package
+                  Name of Package <span className='text-red-500 font-bold'>*</span>
                 </label>
                 <input
                   type="text"
@@ -139,7 +139,7 @@ const AddPackage = () => {
              
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1' htmlFor="type">
-                Connection Type</label>
+                Connection Type <span className='text-red-500 font-bold'>*</span></label>
                 <select name="type" id="type"
                 value={formData.type}
                 onChange={handleChange}
@@ -160,7 +160,7 @@ const AddPackage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price
+                  Price <span className='text-red-500 font-bold'>*</span>
                 </label>
                 <input
                   type="number"
@@ -176,7 +176,7 @@ const AddPackage = () => {
             
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Upload Speed
+                  Upload Speed <span className='text-red-500 font-bold'>*</span>
                 </label>
                 <input
                   type="text"
@@ -193,7 +193,7 @@ const AddPackage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Download Speed
+                  Download Speed <span className='text-red-500 font-bold'>*</span>
                 </label>
                 <input
                   type="text"
@@ -213,7 +213,7 @@ const AddPackage = () => {
                 type="submit"
                 className=" bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
               >
-                Add Package
+                Add Package 
               </button>
 
               <button className="mt-4">

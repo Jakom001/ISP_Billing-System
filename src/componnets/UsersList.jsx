@@ -86,20 +86,21 @@ const UsersList = () => {
       selector: row => row.type,
       sortable: true,
     },
-    {
-      name: 'Connection Status',
-      selector: row => row.isConnected,
-      sortable: true,
-      cell: row => (
-        <span className={`px-2 py-1 rounded ${
-          row.isConnected === true
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-red-100 text-red-800'
-        }`}>
-          {row.isConnected === true ? 'Connected' : 'Disconnected'}
-        </span>
-      )
-    },
+    
+    // {
+    //   name: 'Connection Status',
+    //   selector: row => row.isConnected,
+    //   sortable: true,
+    //   cell: row => (
+    //     <span className={`px-2 py-1 rounded ${
+    //       row.isConnected === true
+    //         ? 'bg-green-100 text-green-800' 
+    //         : 'bg-red-100 text-red-800'
+    //     }`}>
+    //       {row.isConnected === true ? 'Connected' : 'Disconnected'}
+    //     </span>
+    //   )
+    // },
     {
       name: "Expiry",
       selector: row => row.connectionExpiryDate,

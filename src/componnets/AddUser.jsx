@@ -171,7 +171,7 @@ if (preset === 'custom') {
           <form onSubmit={handleSubmit} className='space-y-6'>
             <div>
                 <label className='block text-sm font-medium text-gray-700 mb-1' htmlFor="type">
-                  Connection Type</label>
+                  Connection Type <span className='text-red-500 font-bold'>*</span></label>
                   <select name="type" id="type"
                   value={formData.type}
                   onChange={handleChange}
@@ -190,7 +190,7 @@ if (preset === 'custom') {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
+                    First Name <span className='text-red-500 font-bold'>*</span>
                   </label>
                   <input
                     type="text"
@@ -224,7 +224,7 @@ if (preset === 'custom') {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Username
+                  Username <span className='text-red-500 font-bold'>*</span>
                 </label>
                 <input
                   type="text"
@@ -240,7 +240,7 @@ if (preset === 'custom') {
 
               <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
+                Password <span className='text-red-500 font-bold'>*</span>
               </label>
               <div className="relative">
                 <input
@@ -275,7 +275,7 @@ if (preset === 'custom') {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone Number
+                  Phone Number <span className='text-red-500 font-bold'>*</span>
                 </label>
                 <input
                   type="tel"
@@ -313,7 +313,7 @@ if (preset === 'custom') {
           
           <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Package
+                Package <span className='text-red-500 font-bold'>*</span>
               </label>
               <select
                 name="packageId"
