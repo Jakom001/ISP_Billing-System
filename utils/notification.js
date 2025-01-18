@@ -1,6 +1,6 @@
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-const twilio = require("twilio");
+// const twilio = require("twilio");
 
 const sendEmailNotification = async (email, subject, message) => {
     try{

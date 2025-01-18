@@ -3,6 +3,7 @@ const User = require("../models/userModel");
 const Package = require("../models/packageModel");
 const RouterOSAPI = require('node-routeros').RouterOSAPI;
 const { userSchema, checkConnectionExpiryDate } = require("../middlewares/validator");
+const connection = require('mikrotik/lib/connection');
 
 function getRouterConnection(){
     return  new RouterOSAPI({
@@ -313,7 +314,7 @@ const changeExpiryDate = async (res, req) =>{
         const {error, value} = checkConnectionExpiryDate.validate({connectionExpiryDate});
         if(error){
             return res.status(400).json({
-                message: "Validation failed",
+                message: "Expiry Date Validation failed",
                 success: false,
                 errors: error.details.map((err) => err.message),
             });
@@ -331,7 +332,7 @@ const changeExpiryDate = async (res, req) =>{
         });
     }
 }
-    const activeUsers = () => {
+    const activeUsers = async () => {
         // return User.find({connectionExpiryDate: {$gte: new Date()}}).populate('package');
 
         try{
@@ -344,7 +345,7 @@ const changeExpiryDate = async (res, req) =>{
             if(users.length === 0){
                 return res.status(200).json({success: true, message: "No active users found"})
             }
-            res.status(200).json({success: true, message: "Active users found", data: users})
+            res.status(200).json({success: true, message: "Active users", data: users})
     
         }catch(e){
             console.error("Error getting active users: ", e);
@@ -359,9 +360,42 @@ const changeExpiryDate = async (res, req) =>{
     const expiredUsers = () => {
         return User.find({connectionExpiryDate: {$lt: new Date()}}).populate('package');
     }
-
-    const enabledUsers = () => {
-        return User.find({enabled: true}).populate('package');
+    const enabledUsers = async() => {
+        let connection = null;
+        try {
+            // Establish connection
+            connection = getRouterConnection();
+            await connection.connect();
+    
+            // Get all disabled PPP secrets
+            const disabledUsers = await connection.write('/ppp/secret/print', [
+                '=.proplist=.id,name,profile,comment,disabled',
+                '?disabled=yes'
+            ]);
+    
+            return {
+                success: true,
+                users: disabledUsers.map(user => ({
+                    id: user['.id'],
+                    username: user.name,
+                    profile: user.profile,
+                    comment: user.comment,
+                    disabled: user.disabled
+                }))
+            };
+    
+        } catch (error) {
+            console.error('Error fetching disabled users:', error);
+            return { success: false, message: error.message, users: [] };
+        } finally {
+            if (connection) {
+                try {
+                    await connection.close();
+                } catch (closeError) {
+                    console.error("Error closing Mikrotik connection:", closeError);
+                }
+            }
+        }
     }
 
     const activateUser = async (req, res) => {
@@ -416,8 +450,9 @@ const changeExpiryDate = async (res, req) =>{
             });
         }
         }
+    
 
-    const deactivateUser = async (req, res) => {
+    const disconnectUser = async (req, res) => {
         try{
             const user = await User.findById(req.params.id);
             if(!user){
@@ -429,27 +464,31 @@ const changeExpiryDate = async (res, req) =>{
                 await conn.connect();
                 
                 // First find the item to get its ID
-                const items = await conn.write('/ppp/secret/print', [
+                const secrets = await conn.write('/ppp/secret/print', [
                     '=.proplist=.id',
                     '?name=' + user.username
                 ]);
                 
-                if (items.length > 0) {
+                if (secrets.length > 0) {
                     // Deactivate using the internal ID
-                    await conn.write('/ppp/active/set', [
-                        '=.id=' + items[0]['.id'],
-                        '=status=inactive'
+                    await conn.write('/ppp/secret/set', [
+                        '=.id=' + secrets[0]['.id'],
+                        '=disabled=yes'
                     ]);
-                    conn.close();
-                    user.enabled = false;
-                    await user.save();
-                    res.status(200).json({success: true, message: "User deactivated successfully", data: user})
-                    return;
-                } else {
-                    conn.close();
-                    return res.status(404).json({success: false, message: "PPPoE secret not found in Mikrotik"})
                 }
+
+                // Then remove any active connections
+                const activeConnections = await connection.write('/ppp/active/print', [
+                    '?name=' + username
+                ]);
                 
+                if (activeConnections.length > 0) {
+                    await conn.write('/ppp/active/remove', [
+                        '=.id=' + activeConnections[0]['.id']
+                    ]);    
+                }
+                   return res.status(200).json({success: true, message: "User deactivated successfully", data: user})
+                await conn.close()
             }catch(e) {
                 console.error("Error getting username in mikrotik: ", e);
                 res.status(500).json({
@@ -459,8 +498,9 @@ const changeExpiryDate = async (res, req) =>{
                 });
             }
 
-        }catch(e){
-            console.error("Error getting user: ", e);
+        }catch (err){
+            console.error("Error getting username in mikrotik: ", err)
+
             res.status(500).json({
                 success: false,
                 message: "Error getting user",
@@ -479,4 +519,5 @@ module.exports = {
     activeUsers,
     expiredUsers,
     activateUser,
+    disconnectUser,
 }

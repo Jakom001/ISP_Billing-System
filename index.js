@@ -6,12 +6,12 @@ const packageRoutes = require("./routes/packageRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const authRoutes = require("./routes/authRoutes");
 const connectDB = require("./config/db");
-const cronJobs = require("./utils/cronjobs");
 const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const isAuthenticated = require('./middlewares/authenticateUser');
-
+const {notificationJob} = require("./utils/notifyUsers");
+const { checkBalanceJob } = require('./utils/checkBalance');
 const app = express()
 
 // Middleware
@@ -28,9 +28,9 @@ connectDB();
 app.get("/", (req, res) =>{
     res.send("The server is running...")
 })
-app.use("/api/users", isAuthenticated, userRoutes)
-app.use("/api/packages", isAuthenticated, packageRoutes)
-app.use("/api/payments", isAuthenticated, paymentRoutes)
+app.use("/api/users", userRoutes)
+app.use("/api/packages", packageRoutes)
+app.use("/api/payments",  paymentRoutes)
 app.use('/api/auths', authRoutes)
 
 // Error Handling: 404 Handler
@@ -43,4 +43,14 @@ app.listen(4000, () =>{
 })
 
 // initialize cron jobs
-cronJobs.initializeCronjobs() 
+
+notificationJob.start();
+checkBalanceJob.start();
+
+// handle graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('Stopping cron jobs...');
+    notificationJob.stop();
+    disconnectionJob.stop();
+    process.exit(0);
+});

@@ -9,7 +9,7 @@ function getRouterConnection() {
         user: process.env.MIKROTIK_USER,
         password: process.env.MIKROTIK_PASSWORD,
         port: process.env.MIKROTIK_PORT,
-        timeout: 15000  // Increase timeout to 15 seconds
+        timeout: 15000  
     });
 }
 
@@ -95,11 +95,18 @@ const checkAndDeductUserBalance = async () => {
     }
 };
 
-const initializeCronjobs = () => {
-    cron.schedule("57 23 * * *", async () => {
-        console.log("Running connection check and balance deduction");
+// 
+const checkBalanceJob = cron.schedule('57 23 * * *', async () => {
+    try {
+        console.log('Running disconnection job...');
         await checkAndDeductUserBalance();
-    });
-};
+        console.log('Disconnection job completed');
+    } catch (error) {
+        console.error('Error in disconnection job:', error);
+    }
+}, {
+    scheduled: true,
+    timezone: "Africa/Nairobi"
+});
 
-module.exports = { initializeCronjobs };
+module.exports = { checkBalanceJob  };

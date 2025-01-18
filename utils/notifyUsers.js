@@ -6,20 +6,20 @@ const notifyUsers = async () => {
   let subject = "Wifi Suscription Expiry Reminder";
     try {
       const now = new Date();
-      const users = await User.find({ connectionExpiry: { $gte: now } }).populate({
+      const users = await User.find({ connectionExpiryDate: { $gte: now } }).populate({
         path: "package",
         select: "packageName price"
       });
   
       for (const user of users) {
         const daysRemaining = Math.ceil((user.connectionExpiryDate - now) / (1000 * 60 * 60 * 24));
-        const packagePrice = users.package.price;
+        const packagePrice = user.package.price;
   
         if (user.balance < packagePrice) {
           let message = `Dear ${user.firstName}, your ${user.package.packageName}S internet package subscription expires in `;
   
           if (daysRemaining === 5 || daysRemaining === 3 || daysRemaining === 1 || daysRemaining === 0 ) {
-            message += `${daysRemaining} days on ${connectionExpiryDate.toDateString()} 11:59pm. Please top up Ksh ${users.package.price - user.balance} to till number ${process.env.TillNumber}.Thank you.`;
+            message += `${daysRemaining} days on ${user.connectionExpiryDate.toDateString()} 11:59pm. Please top up Ksh ${user.package.price - user.balance} to till number ${process.env.TillNumber}.Thank you.`;
 
             // Avoid duplicate notifications
             if (!user.lastReminderSent || new Date(user.lastReminderSent).toDateString() !== now.toDateString()) {
@@ -45,12 +45,18 @@ const notifyUsers = async () => {
     }
   };
   
-  // Schedule job to run daily
-  const initializeCronjobs = () => {
-    cron.schedule("00 08 * * *", async () => {
-            console.log("Running user notifications...");
-            await notifyUsers();
-        });
-  }
+  // Schedule job to run daily at 8 AM
+  const notificationJob = cron.schedule('0 8 * * *', async () => {
+    try {
+        console.log('Running notification job...');
+        await notifyUsers();
+        console.log('Notification job completed');
+    } catch (error) {
+        console.error('Error in notification job:', error);
+    }
+}, {
+    scheduled: true,
+    timezone: 'Africa/Nairobi'
+});
 
-  module.exports = { initializeCronjobs }
+  module.exports = { notificationJob }
