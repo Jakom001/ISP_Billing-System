@@ -29,21 +29,7 @@ const register = async (req, res) => {
             firstName, lastName, phone, email, password: hashedPassword
         })
         const result = await user.save()
-        // jwt
-        const token = jwt.sign(
-            { userId: result._id, email: result.email},
-                process.env.JWT_SECRET,
-            {
-                expiresIn: process.env.JWT_EXPIRATION
-            }
-        )
-
-        res.cookie('token', token, {
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 60 * 60 * 1000, // 1 hour timeout
-            httpOnly: true
-        })
-
+       
         return res.status(201).json({message: 'User registered successfully', data: result})
     }catch (error){
         return res.status(400).json({message: "Error occured while creating the user", error: error.message})
@@ -81,11 +67,11 @@ const login = async (req, res) => {
         )
 
         res.cookie('token', token, {
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 60 * 60 * 1000, // 1 hour timeout
-            httpOnly: true
-        })
-
+            secure: false, // Use true in production (with HTTPS)
+            httpOnly: true,
+            maxAge: 60 * 60 * 1000, // 1 hour
+            sameSite: 'lax', 
+        });
         res.status(200).json({message:"login successfull", user: user.firstName})
 
     }catch (error){

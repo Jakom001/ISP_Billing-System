@@ -9,14 +9,19 @@ const connectDB = require("./config/db");
 const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
-const isAuthenticated = require('./middlewares/authenticateUser');
+const {isAuthenticated, checkUser} = require('./middlewares/authenticateUser');
 const {notificationJob} = require("./utils/notifyUsers");
 const { checkBalanceJob } = require('./utils/checkBalance');
 const app = express()
 
 // Middleware
 app.use(express.json())
-app.use(cors())
+app.use(cors(
+    {
+        origin: 'http://localhost:5173',
+        credentials: true,
+    }
+))
 app.use(helmet())
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser())
@@ -25,12 +30,14 @@ app.use(cookieParser())
 connectDB();
 
 // Routes
+
+app.get('*', checkUser)
 app.get("/", (req, res) =>{
     res.send("The server is running...")
 })
-app.use("/api/users", userRoutes)
-app.use("/api/packages", packageRoutes)
-app.use("/api/payments",  paymentRoutes)
+app.use("/api/users", isAuthenticated, userRoutes)
+app.use("/api/packages", isAuthenticated, packageRoutes)
+app.use("/api/payments",  isAuthenticated, paymentRoutes)
 app.use('/api/auths', authRoutes)
 
 // Error Handling: 404 Handler
